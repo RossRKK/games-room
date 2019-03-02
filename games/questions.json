@@ -1,0 +1,52 @@
+[
+    {
+        "prompt": "Would you rather?",
+        "opt1": "Redo the networking practical",
+        "opt2": "Have Tristan kick you in the dick"
+    },
+    {
+        "prompt": "Would you rather?",
+        "opt1": "Work for JP Morgan",
+        "opt2": "Work for Amex"
+    },
+    {
+        "prompt": "Would you rather?",
+        "opt1": "Work on the largest java script code base",
+        "opt2": "Kill yourself"
+    },
+    {
+        "prompt": "Would you rather?",
+        "opt1": "Shag Rory",
+        "opt2": "Become him"
+    },
+    {
+        "prompt": "Who would win in a fight?",
+        "opt1": "Seamus",
+        "opt2": "Charlotte"
+    },
+    {
+        "prompt": "Who would win in a fight?",
+        "opt1": "Steven",
+        "opt2": "Ross"
+    },
+    {
+        "prompt": "Who would win in a fight?",
+        "opt1": "Ian Gent",
+        "opt2": "Ian Gent"
+    },
+    {
+        "prompt": "Who would win in a fight?",
+        "opt1": "Steve Linton",
+        "opt2": "The rest of the School of Computer Science"
+    },
+    {
+        "prompt": "Who would win in a fight?",
+        "opt1": "1 horse sized duck",
+        "opt2": "100 duck sized horses"
+    },
+    {
+        "prompt": "Who would win in a fight?",
+        "opt1": "The StACS Hack pizza budget",
+        "opt2": "100 hungry students"
+    }
+]

@@ -1,4 +1,5 @@
 const Game = require("./game.js");
+let questions = require('./questions.json');
 
 const type = "WouldYouRather";
 
@@ -44,12 +45,20 @@ class WouldYouRather extends Game.Game {
 
         this.type = type;
 
+        this.midRound = false;
+
         //TODO load questions
-        this.questions = [];
+        this.questions = questions;
+        console.log(this.questions);
+
+        this.questions = this.questions.map(q => new Question(q.prompt, q.opt1, q.opt2));
+
+
         this.currentQuestion = new Question("Test Question", "Opt1", "Opt2");
         this.questions.push(this.currentQuestion);
 
-        this.groupA = {};this.opt1Answers = [];
+        this.groupA = {};
+        this.opt1Answers = [];
         this.opt2Answers = [];
 
         this.opt1Votes = [];
@@ -93,7 +102,6 @@ class WouldYouRather extends Game.Game {
         } else {this.currentQuestionbreak;
             delete this.groupB[player.username];
         }
-
         this.sendPlayerUpdate();
     }
 
@@ -135,49 +143,57 @@ class WouldYouRather extends Game.Game {
                 isA: p.isA
             });
         });
+        this.midRound = true;
     }
 
     handleMsg(msg, player) {
         switch (msg.type) {
             case "ANSWER":
-                this.currentQuestion.answer(msg.opt, player);
-                player.hasPlayed = true;
-
+                if (!player.hasPlayed && this.midRound) {
+                    this.currentQuestion.answer(msg.opt, player);
+                    player.hasPlayed = true;
+                }
                 break;
             case "VOTE":
-                this.currentQuestion.vote(msg.opt, player);
-                player.hasPlayed = true;
+                if (!player.hasPlayed && this.midRound) {
+                    this.currentQuestion.vote(msg.opt, player);
+                    player.hasPlayed = true;
+                }
                 break;
             case "START":
                 this.startRound();
                 break;
         }
 
-        if (Object.values(this.groupA).every((p) => p.hasPlayed) && Object.values(this.groupB).every((p) => p.hasPlayed)) {
-            if (this.currentQuestion.opt2Answers.length > this.currentQuestion.opt1Answers.length) {
-                this.currentQuestion.opt2Votes.forEach((p) => {
-                    p.score++;
-                });
-            } else if (this.currentQuestion.opt2Answers.length < this.currentQuestion.opt1Answers.length) {
-                this.currentQuestion.opt1Votes.forEach((p) => {
-                    p.score++;
-                });
-            } else {
-                //draw
-            }
+        if (this.midRound) {
 
-            this.sendMsgToAll({
-                type: "RESULT",
-                opt1: {
-                    answers: this.currentQuestion.opt1Answers.map(p => p.username),
-                    votes: this.currentQuestion.opt1Votes.map(p => p.username)
-                },
-                opt2: {
-                    answers: this.currentQuestion.opt2Answers.map(p => p.username),
-                    votes: this.currentQuestion.opt2Votes.map(p => p.username)
-                },
-                scores: Object.values(this.allPlayers).map(playerToViewModel)
-            });
+            if (Object.values(this.groupA).every((p) => p.hasPlayed) && Object.values(this.groupB).every((p) => p.hasPlayed)) {
+                this.midRound = false;
+                if (this.currentQuestion.opt2Answers.length > this.currentQuestion.opt1Answers.length) {
+                    this.currentQuestion.opt2Votes.forEach((p) => {
+                        p.score++;
+                    });
+                } else if (this.currentQuestion.opt2Answers.length < this.currentQuestion.opt1Answers.length) {
+                    this.currentQuestion.opt1Votes.forEach((p) => {
+                        p.score++;
+                    });
+                } else {
+                    //draw
+                }
+
+                this.sendMsgToAll({
+                    type: "RESULT",
+                    opt1: {
+                        answers: this.currentQuestion.opt1Answers.map(p => p.username),
+                        votes: this.currentQuestion.opt1Votes.map(p => p.username)
+                    },
+                    opt2: {
+                        answers: this.currentQuestion.opt2Answers.map(p => p.username),
+                        votes: this.currentQuestion.opt2Votes.map(p => p.username)
+                    },
+                    scores: Object.values(this.allPlayers).map(playerToViewModel)
+                });
+            }
         }
     }
 }
