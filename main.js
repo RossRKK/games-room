@@ -36,7 +36,8 @@ function handleWebSocket(ws, req) {
 
         ws.send(JSON.stringify({
             type: "ID",
-            id: game.id
+            id: game.id,
+            gameType: game.type
         }));
     } else {
         ws.send("Error starting game");

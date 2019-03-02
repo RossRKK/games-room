@@ -1,5 +1,7 @@
 const Game = require("./game.js");
 
+const type = "WouldYouRather";
+
 class Question {
     constructor (prompt, opt1, opt2) {
         this.prompt = prompt;
@@ -37,6 +39,8 @@ class Question {
 class WouldYouRather extends Game.Game {
     constructor (gameId) {
         super(gameId);
+
+        this.type = type;
 
         //TODO load questions
         this.questions = [];
@@ -189,6 +193,6 @@ class WouldYouRather extends Game.Game {
 }
 
 exports.Game = WouldYouRather;
-exports.id = "WouldYouRather";
+exports.id = type;
 exports.title = "Would You Rather";
 exports.desc = "";

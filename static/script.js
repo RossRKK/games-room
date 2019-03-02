@@ -1,10 +1,12 @@
 "use strict";
 
+var gameTypes = {
+    WouldYouRather: WouldYouRather
+}
+
 var gameType = "WouldYouRather";
 
 var ws;
-
-var isA = false;
 
 var user;
 
@@ -31,26 +33,6 @@ $(document).ready(function () {
         $("#join").hide();
         $("#game").show();
     });
-
-    $("#opt1").on("click", function (e) {
-        ws.send(JSON.stringify({
-            type: isA ? "ANSWER" : "VOTE",
-            opt: 1
-        }));
-    });
-
-    $("#opt2").on("click", function (e) {
-        ws.send(JSON.stringify({
-            type: isA ? "ANSWER" : "VOTE",
-            opt: 2
-        }));
-    });
-
-    $("#next").on("click", function (e) {
-        ws.send(JSON.stringify({
-            type: "START"
-        }));
-    });
 });
 
 function openWebSocket(gameType, username, gameId) {
@@ -68,46 +50,19 @@ function openWebSocket(gameType, username, gameId) {
     return new WebSocket(url);
 }
 
-function arrToStr(arr) {
-    var str = "";
-
-    for (var i = 0; i < arr.length; i++) {
-        str += arr[i];
-
-        if (i !=arrToStr.length - 1) {
-            str += ", ";
-        }
-    }
-
-    return str;
-}
-
 function handleWebSocket(ws) {
     ws.onmessage = function (msg) {
         msg = JSON.parse(msg.data);
-            console.log(msg);
 
         switch (msg.type) {
-            case "QUESTION":
-                $("#prompt").text(msg.prompt);
-                $("#opt1").text(msg.opt1);
-                $("#opt2").text(msg.opt2);
-
-                isA = msg.isA;
-
-                $("#message").text(msg.isA ? "Answer honestly" : "Choose the answer you think will be most popular");
-                break;
-            case "RESULT":
-                $("#resp1").text(arrToStr(msg.opt1.answers));
-                $("#resp2").text(arrToStr(msg.opt2.answers));
-
-                $("#scores").empty();
-
-                $("#scores").append(msg.scores.map(score => "<li>" + score.username + " " + score.score + "</li>"));
-                break;
             case "ID":
                 $("#id").text(msg.id);
+                gameType = msg.gameType;
+                //initialise the game
+                gameTypes[gameType].init();
                 break;
+            default:
+                gameTypes[gameType].handleMsg(msg);
         }
     }
 
