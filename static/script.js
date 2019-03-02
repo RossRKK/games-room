@@ -6,11 +6,13 @@ var ws;
 
 var isA = false;
 
+var user;
+
 $(document).ready(function () {
     $("#game").hide();
-    
+
     $("#start").on("click", function (e) {
-        var user = $("#name").val();
+        user = $("#name").val();
         ws = openWebSocket(gameType, user);
 
         handleWebSocket(ws);
@@ -19,7 +21,7 @@ $(document).ready(function () {
         $("#game").show();
     });
 
-    $("#join").on("click", function (e) {
+    $("#join-btn").on("click", function (e) {
         var user = $("#name").val();
         var gameId = $("#game-id").val();
         ws = openWebSocket(gameType, user, gameId);
@@ -43,6 +45,12 @@ $(document).ready(function () {
             opt: 2
         }));
     });
+
+    $("#next").on("click", function (e) {
+        ws.send(JSON.stringify({
+            type: "START"
+        }));
+    });
 });
 
 function openWebSocket(gameType, username, gameId) {
@@ -50,6 +58,20 @@ function openWebSocket(gameType, username, gameId) {
      + (gameId ? ("/" + encodeURIComponent(gameId)) : "");
      console.log(url)
     return new WebSocket(url);
+}
+
+function arrToStr(arr) {
+    var str = "";
+
+    for (var i = 0; i < arr.length; i++) {
+        str += arr[i];
+
+        if (i !=arrToStr.length - 1) {
+            str += ", ";
+        }
+    }
+
+    return str;
 }
 
 function handleWebSocket(ws) {
@@ -68,6 +90,15 @@ function handleWebSocket(ws) {
                 $("#message").text(msg.isA ? "Answer honestly" : "Choose the answer you think will be most popular");
                 break;
             case "RESULT":
+                $("#resp1").text(arrToStr(msg.opt1.answers));
+                $("#resp2").text(arrToStr(msg.opt2.answers));
+
+                $("#scores").empty();
+
+                $("#scores").append(msg.scores.map(score => score.username + " " + score.score));
+                break;
+            case "ID":
+                $("#id").text(msg.id);
                 break;
         }
     }

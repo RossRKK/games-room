@@ -33,6 +33,11 @@ function handleWebSocket(ws, req) {
     if (game) {
         console.log("Adding player");
         game.addPlayer(player);
+
+        ws.send(JSON.stringify({
+            type: "ID",
+            id: game.id
+        }));
     } else {
         ws.send("Error starting game");
         ws.close();

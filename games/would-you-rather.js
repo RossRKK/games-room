@@ -6,11 +6,7 @@ class Question {
         this.opt1 = opt1;
         this.opt2 = opt2;
 
-        this.opt1Answers = [];
-        this.opt2Answers = [];
-
-        this.opt1Votes = [];
-        this.opt2Votes = [];
+        this.reset();
     }
 
     answer(opt, player) {
@@ -28,6 +24,14 @@ class Question {
             this.opt2Votes.push(player);
         }
     }
+
+    reset() {
+        this.opt1Answers = [];
+        this.opt2Answers = [];
+
+        this.opt1Votes = [];
+        this.opt2Votes = [];
+    }
 }
 
 class WouldYouRather extends Game.Game {
@@ -39,7 +43,11 @@ class WouldYouRather extends Game.Game {
         this.currentQuestion = new Question("Test Question", "Opt1", "Opt2");
         this.questions.push(this.currentQuestion);
 
-        this.groupA = {};
+        this.groupA = {};this.opt1Answers = [];
+        this.opt2Answers = [];
+
+        this.opt1Votes = [];
+        this.opt2Votes = [];
         this.groupB = {};
     }
 
@@ -69,16 +77,17 @@ class WouldYouRather extends Game.Game {
 
             // player.sendMsg({
             //     type: "TEAM",
-            //     team: "A"
+            //     team: "A"this.opt1Answers = [];
+        this.opt2Answers = [];
+
+        this.opt1Votes = [];
+        this.opt2Votes = [];
             // });
             player.isA = true;
         }
 
         player.hasPlayed = false;
         player.score = 0;
-
-        console.log(this.groupA)
-        console.log(this.groupB)
     }
 
     removePlayer(player) {
@@ -99,8 +108,6 @@ class WouldYouRather extends Game.Game {
         this.groupA = this.groupB;
         this.groupB = temp;
 
-        console.log(this.groupA)
-        console.log(this.groupB)
 
         Object.values(this.groupA).forEach((p) => {
             p.isA = true;
@@ -120,6 +127,7 @@ class WouldYouRather extends Game.Game {
 
         //draw new question
         this.currentQuestion = this.questions[Math.floor(Math.random() * this.questions.length)];
+        this.currentQuestion.reset();
 
         Object.values(this.allPlayers).forEach((p) => {
             p.sendMsg({
