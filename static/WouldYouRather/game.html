@@ -1,18 +1,30 @@
-<button id="next" class="btn btn-primary">Next Round</button>
+<style>
+    .opt {
+        cursor: pointer;
+        border-style: solid;
+        border-radius: 1em;
+        display: none;
+        margin: 1em;
+        padding: 1em;
+    }
+</style>
+
+<ul id="scores">
+</ul>
+
+<button id="next" class="btn btn-primary">Start</button>
+
+<h2 id="message"></h2>
+
+<hr>
+
+<h3 id="prompt"></h3>
+
 <div class="row">
-    <div class="col" id="message"></div>
-</div>
-<div class="row">
-    <div class="col" id="prompt"></div>
-</div>
-<div class="row">
-    <div class="col opt" id="opt1"></div>
-    <div class="col opt" id="opt2"></div>
+    <div class="col opt text-primary" id="opt1"></div>
+    <div class="col opt text-danger" id="opt2"></div>
 </div>
 <div class="row">
     <div class="col" id="resp1"></div>
     <div class="col" id="resp2"></div>
 </div>
-
-<ul id="scores">
-</ul>

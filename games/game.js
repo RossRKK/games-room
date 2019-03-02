@@ -14,9 +14,7 @@ class Game {
     }
 
     removePlayer(player) {
-        if (player) {
-            delete this.allPlayers[player.username];
-        }
+        delete this.allPlayers[player.username];
     }
 
     sendMsgToGroup(msg, group) {

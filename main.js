@@ -11,10 +11,18 @@ const controller = require("./controller.js");
 
 app.use(express.static("static"));
 
-
+app.get("/games", (req, res) => {
+    res.send(Object.values(model.getGameTypes()).map(g => {
+        console.log(g)
+        return {
+            id: g.id,
+            title: g.title,
+            desc: g.desc
+        };
+    }));
+});
 
 function handleWebSocket(ws, req) {
-    console.log(req.params)
     console.log("Got connection \"" + req.params.gameType + "\" \"" + req.params.gameId + "\" \"" + req.params.username + "\"");
 
     let player = new model.Player(req.params.username, ws);
@@ -26,27 +34,23 @@ function handleWebSocket(ws, req) {
     }
 
     if (!game) {
-        console.log("Starting new game");
         game = new model.startGame(req.params.gameType);
     }
 
     if (game) {
-        console.log("Adding player");
-        game.addPlayer(player);
-
         ws.send(JSON.stringify({
             type: "ID",
             id: game.id,
             gameType: game.type
         }));
+
+        game.addPlayer(player);
     } else {
         ws.send("Error starting game");
         ws.close();
     }
 
     ws.on('message', function (msg) {
-        console.log("Hello")
-        console.log(msg);
         msg = JSON.parse(msg);
         game.handleMsg(msg, player);
     });

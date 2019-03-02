@@ -20,10 +20,8 @@ exports.startGame = function (gameType) {
         let id = generateGameId();
         console.log(id);
 
-        let game = new gameTypes[gameType](id);
+        let game = new gameTypes[gameType].Game(id);
         onGoingGames[id] = game;
-
-        console.log("Constructed new game");
 
         return game;
     } else {
@@ -37,6 +35,8 @@ exports.getGame = function (id) {
     id = id.toUpperCase();
     return onGoingGames[id];
 }
+
+exports.getGameTypes = () => gameTypes;
 
 class Player {
     constructor (username, ws) {

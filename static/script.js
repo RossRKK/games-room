@@ -31,6 +31,7 @@ $(document).ready(function () {
         handleWebSocket(ws);
 
         $("#join").hide();
+
         $("#game").show();
     });
 });
@@ -54,12 +55,14 @@ function handleWebSocket(ws) {
     ws.onmessage = function (msg) {
         msg = JSON.parse(msg.data);
 
+        console.log(msg);
+
         switch (msg.type) {
             case "ID":
-                $("#id").text(msg.id);
                 gameType = msg.gameType;
                 //initialise the game
                 gameTypes[gameType].init();
+                $("#id").text(msg.id);
                 break;
             default:
                 gameTypes[gameType].handleMsg(msg);

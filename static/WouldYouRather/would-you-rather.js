@@ -1,6 +1,8 @@
 var WouldYouRather = function () {
     var isA = false;
 
+    var players = [];
+
     function init() {
         //load html code into game div
         $("#game").load(gameType + "/game.html", function () {
@@ -23,6 +25,8 @@ var WouldYouRather = function () {
                     type: "START"
                 }));
             });
+
+            showPlayers(players);
         });
     }
 
@@ -40,14 +44,28 @@ var WouldYouRather = function () {
         return str;
     }
 
+    function showPlayers(ps) {
+        players = ps;
+        $("#scores").empty();
+
+        $("#scores").append(players.map(player => "<li>" + player.username + " " + player.score + "</li>"));
+    }
+
     function handleMsg (msg) {
         switch (msg.type) {
             case "QUESTION":
+                $("#next").hide();
+                $("#next").text("Next Round");
                 $("#prompt").text(msg.prompt);
                 $("#opt1").text(msg.opt1);
                 $("#opt2").text(msg.opt2);
 
+                $("#resp1").empty();
+                $("#resp2").empty();
+
                 isA = msg.isA;
+
+                $(".opt").show();
 
                 $("#message").text(msg.isA ? "Answer honestly" : "Choose the answer you think will be most popular");
                 break;
@@ -55,9 +73,11 @@ var WouldYouRather = function () {
                 $("#resp1").text(arrToStr(msg.opt1.answers));
                 $("#resp2").text(arrToStr(msg.opt2.answers));
 
-                $("#scores").empty();
-
-                $("#scores").append(msg.scores.map(score => "<li>" + score.username + " " + score.score + "</li>"));
+                showPlayers(msg.scores);
+                $("#next").show();
+                break;
+            case "PLAYER":
+                showPlayers(msg.players);
                 break;
         }
     }

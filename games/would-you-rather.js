@@ -2,6 +2,8 @@ const Game = require("./game.js");
 
 const type = "WouldYouRather";
 
+let playerToViewModel = (p) => { return { username: p.username, score: p.score, isA: p.isA } };
+
 class Question {
     constructor (prompt, opt1, opt2) {
         this.prompt = prompt;
@@ -62,6 +64,8 @@ class WouldYouRather extends Game.Game {
         } else {
             delete this.groupB[player.username];
         }
+
+        this.sendPlayerUpdate();
     }
 
     addPlayer(player) {
@@ -70,41 +74,37 @@ class WouldYouRather extends Game.Game {
         if (Object.keys(this.groupA).length > Object.keys(this.groupB).length) {
             this.groupB[player.username] = player;
 
-            // player.sendMsg({
-            //     type: "TEAM",
-            //     team: "B"
-            // });
-
             player.isA = false;
         } else {
             this.groupA[player.username] = player;
-
-            // player.sendMsg({
-            //     type: "TEAM",
-            //     team: "A"this.opt1Answers = [];
-        this.opt2Answers = [];
-
-        this.opt1Votes = [];
-        this.opt2Votes = [];
-            // });
             player.isA = true;
         }
 
         player.hasPlayed = false;
         player.score = 0;
+
+        this.sendPlayerUpdate();
     }
 
     removePlayer(player) {
-        super.removePlayer();
+        super.removePlayer(player);
         if (player.isA) {
             delete this.groupA[player.username];
         } else {this.currentQuestionbreak;
             delete this.groupB[player.username];
         }
+
+        this.sendPlayerUpdate();
+    }
+
+    sendPlayerUpdate() {
+        this.sendMsgToAll({
+            type: "PLAYER",
+            players: Object.values(this.allPlayers).map(playerToViewModel)
+        });
     }
 
     startRound() {
-        console.log("Starting round");
         Object.values(this.allPlayers).forEach((p) => { p.hasPlayed = false });
 
         //swap the groups round
@@ -113,20 +113,13 @@ class WouldYouRather extends Game.Game {
         this.groupB = temp;
 
 
+
         Object.values(this.groupA).forEach((p) => {
             p.isA = true;
-            // p.sendMsg({
-            //     type: "TEAM",
-            //     team: "A"
-            // });
         });
 
         Object.values(this.groupB).forEach((p) => {
             p.isA = false;
-            // p.sendMsg({
-            //     type: "TEAM",
-            //     team: "B"
-            // });
         });
 
         //draw new question
@@ -142,11 +135,9 @@ class WouldYouRather extends Game.Game {
                 isA: p.isA
             });
         });
-        console.log("done")
     }
 
     handleMsg(msg, player) {
-        console.log(msg);
         switch (msg.type) {
             case "ANSWER":
                 this.currentQuestion.answer(msg.opt, player);
@@ -162,7 +153,6 @@ class WouldYouRather extends Game.Game {
                 break;
         }
 
-        //if everyone has played, push back the resul{opt1: {
         if (Object.values(this.groupA).every((p) => p.hasPlayed) && Object.values(this.groupB).every((p) => p.hasPlayed)) {
             if (this.currentQuestion.opt2Answers.length > this.currentQuestion.opt1Answers.length) {
                 this.currentQuestion.opt2Votes.forEach((p) => {
@@ -186,7 +176,7 @@ class WouldYouRather extends Game.Game {
                     answers: this.currentQuestion.opt2Answers.map(p => p.username),
                     votes: this.currentQuestion.opt2Votes.map(p => p.username)
                 },
-                scores: Object.values(this.allPlayers).map((p) => { return { username: p.username, score: p.score } })
+                scores: Object.values(this.allPlayers).map(playerToViewModel)
             });
         }
     }
