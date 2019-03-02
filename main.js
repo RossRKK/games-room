@@ -11,15 +11,19 @@ const controller = require("./controller.js");
 
 app.use(express.static("static"));
 
-app.ws("/:gameType/:gameId/:username", function (ws, req) {
-    console.log("Got connection");
 
-    console.log(req.params);
+
+function handleWebSocket(ws, req) {
+    console.log(req.params)
+    console.log("Got connection \"" + req.params.gameType + "\" \"" + req.params.gameId + "\" \"" + req.params.username + "\"");
 
     let player = new model.Player(req.params.username, ws);
-    console.log(player);
 
-    let game = model.getGame(req.params.gameId);
+    let game;
+
+    if (req.params.gameId) {
+        game = model.getGame(req.params.gameId);
+    }
 
     if (!game) {
         console.log("Starting new game");
@@ -35,7 +39,9 @@ app.ws("/:gameType/:gameId/:username", function (ws, req) {
     }
 
     ws.on('message', function (msg) {
+        console.log("Hello")
         console.log(msg);
+        msg = JSON.parse(msg);
         game.handleMsg(msg, player);
     });
 
@@ -45,9 +51,12 @@ app.ws("/:gameType/:gameId/:username", function (ws, req) {
 
     ws.on('error', function (err) {
         console.err(err);
-        game.handleError(player);
+        game.handleError(err, player);
     });
-});
+}
+
+app.ws("/:gameType/:username/:gameId", handleWebSocket);
+app.ws("/:gameType/:username", handleWebSocket);
 
 const port = process.env.PORT ? process.env.PORT : 8080;
 

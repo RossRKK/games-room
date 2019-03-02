@@ -13,6 +13,12 @@ class Game {
         }
     }
 
+    removePlayer(player) {
+        if (player) {
+            delete this.allPlayers[player.username];
+        }
+    }
+
     sendMsgToGroup(msg, group) {
         Object.values(group).forEach((player) => {
             player.sendMsg(msg);
@@ -29,11 +35,11 @@ class Game {
     }
 
     handleClose(player) {
-        delete this.allPlayers[player.username];
+        this.removePlayer(player);
     }
 
-    handleError(player) {
-        delete this.allPlayers[player.username];
+    handleError(err, player) {
+        this.removePlayer(player);
     }
 }
 

@@ -1,0 +1,10 @@
+#game {
+    text-align: center;
+    display: none;
+}
+
+.opt {
+    cursor: pointer;
+    border-style: solid;
+    border-radius: 1em;
+}

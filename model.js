@@ -18,12 +18,16 @@ exports.startGame = function (gameType) {
     //check if a game type with that id exists
     if (gameTypes[gameType]) {
         let id = generateGameId();
+        console.log(id);
 
         let game = new gameTypes[gameType](id);
         onGoingGames[id] = game;
 
+        console.log("Constructed new game");
+
         return game;
     } else {
+        console.log("No game of type " + gameType);
         //there isn't a type of game with that id
         return null;
     }
