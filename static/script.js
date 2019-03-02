@@ -16,7 +16,7 @@ $(document).ready(function () {
     $("#join-btn").on("click", function (e) {
         var user = $("#name").val();
         var gameId = $("#game-id").val();
-        ws = openWebSocket(gameType, user, gameId);
+        ws = openWebSocket(null, user, gameId);
 
         handleWebSocket(ws);
 

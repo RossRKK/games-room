@@ -1,0 +1,13 @@
+if isA == true
+
+{
+    "type": "ANSWER",
+    "opt": 1 or 2
+}
+
+if isA == false
+
+{
+    "type": "VOTE",
+    "opt": 1 or 2
+}

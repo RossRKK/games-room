@@ -191,7 +191,7 @@ class WouldYouRather extends Game.Game {
                         answers: this.currentQuestion.opt2Answers.map(p => p.username),
                         votes: this.currentQuestion.opt2Votes.map(p => p.username)
                     },
-                    scores: Object.values(this.allPlayers).map(playerToViewModel)
+                    scores: Object.values(this.allPlayers).map(playerToViewModel).sort((a, b) => b.score - a.score)
                 });
             }
         }

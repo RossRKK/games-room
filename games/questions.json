@@ -48,5 +48,10 @@
         "prompt": "Who would win in a fight?",
         "opt1": "The StACS Hack pizza budget",
         "opt2": "100 hungry students"
+    },
+    {
+        "prompt": "What would you rather be without?",
+        "opt1": "Coffee",
+        "opt2": "Your right arm"
     }
 ]
