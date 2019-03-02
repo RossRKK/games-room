@@ -2,7 +2,7 @@ let gameTypes = require("./games");
 
 let onGoingGames = {};
 
-const allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+const allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const codeLength = 4;
 function generateGameId() {
     let id = "";

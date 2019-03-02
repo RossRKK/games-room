@@ -54,7 +54,15 @@ $(document).ready(function () {
 });
 
 function openWebSocket(gameType, username, gameId) {
-    var url = "ws://localhost:8080/" + encodeURIComponent(gameType) + "/" + encodeURIComponent(username)
+    var loc = window.location, new_uri;
+        if (loc.protocol === "https:") {
+            new_uri = "wss:";
+        } else {
+            new_uri = "ws:";
+        }
+    new_uri += "//" + loc.host;
+
+    var url = new_uri + "/"+ encodeURIComponent(gameType) + "/" + encodeURIComponent(username)
      + (gameId ? ("/" + encodeURIComponent(gameId)) : "");
      console.log(url)
     return new WebSocket(url);
@@ -95,7 +103,7 @@ function handleWebSocket(ws) {
 
                 $("#scores").empty();
 
-                $("#scores").append(msg.scores.map(score => score.username + " " + score.score));
+                $("#scores").append(msg.scores.map(score => "<li>" + score.username + " " + score.score + "</li>"));
                 break;
             case "ID":
                 $("#id").text(msg.id);
