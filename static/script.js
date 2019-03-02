@@ -13,16 +13,6 @@ var user;
 $(document).ready(function () {
     $("#game").hide();
 
-    $("#start").on("click", function (e) {
-        user = $("#name").val();
-        ws = openWebSocket(gameType, user);
-
-        handleWebSocket(ws);
-
-        $("#join").hide();
-        $("#game").show();
-    });
-
     $("#join-btn").on("click", function (e) {
         var user = $("#name").val();
         var gameId = $("#game-id").val();
@@ -34,7 +24,40 @@ $(document).ready(function () {
 
         $("#game").show();
     });
+
+    var games = $.get("/games").done(function (games) {
+        console.log(games);
+        addGameButtons(games);
+    })
 });
+
+function addGameButtons(games) {
+    games.forEach(function (game) {
+        var btn = document.createElement("button");
+        btn["data-game"] = game;
+        btn.innerText = game.title;
+
+        btn.className = "btn btn-primary";
+
+        btn.onclick = function (e) {
+            var game = e.target["data-game"];
+            gameType = game.id;
+
+            $("#header").text(game.title);
+            document.title = game.title;
+
+            user = $("#name").val();
+            ws = openWebSocket(gameType, user);
+
+            handleWebSocket(ws);
+
+            $("#join").hide();
+            $("#game").show();
+        }
+
+        $("#games").append(btn);
+    });
+}
 
 function openWebSocket(gameType, username, gameId) {
     var loc = window.location, new_uri;
