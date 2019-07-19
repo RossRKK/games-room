@@ -41,4 +41,38 @@ class Game {
     }
 }
 
+class AdminGame extends Game {
+    constructor(gameId, creator) {
+        super(gameId);
+
+        this.admins = {
+        };
+
+        this.admins[creator.username] = creator;
+    }
+
+    removePlayer(player) {
+        delete this.admins[player.username];
+        super.removePlayer(player);
+    }
+
+    isAdmin(username) {
+        return this.admins[username] !== undefined;
+    }
+
+    addAdmin(player) {
+        this.admins[player.username] = player;
+    }
+
+    removeAdmin(username) {
+        delete this.admins[username];
+    }
+
+    sendMsgToAdmins(msg) {
+        this.sendMsgToGroup(msg, this.admins);
+    }
+}
+
+exports.AdminGame = AdminGame;
+
 exports.Game = Game;

@@ -14,13 +14,13 @@ function generateGameId() {
     return id;
 }
 
-exports.startGame = function (gameType) {
+exports.startGame = function (gameType, player) {
     //check if a game type with that id exists
     if (gameTypes[gameType]) {
         let id = generateGameId();
         console.log(id);
 
-        let game = new gameTypes[gameType].Game(id);
+        let game = new gameTypes[gameType].Game(id, player);
         onGoingGames[id] = game;
 
         return game;
@@ -45,6 +45,7 @@ class Player {
     }
 
     sendMsg(msg) {
+        console.log(msg);
         this.ws.send(JSON.stringify(msg));
     }
 }

@@ -1,0 +1,36 @@
+<span class="settings"><button id="toggle-control" onclick="controller.toggleControlsClick()" class="btn btn-default">Toggle Controls</button></span>
+<p><h2>Rules</h2><span id="rulesTitle">(expand)</span></p>
+<div id="rules">
+	<p>In killer each player is given a certain number of lives (normally 3).</p>
+	<p>Enter the name of each player in the "Add Player" section. Once you have entered the name of each player press start.</p>
+	<p>Every turn a player is randomly picked from the "To Be Drawn" list, this player must then take a shot.</p>
+	<p>If the player is unavailable you can press "Replace" to select another player.</p>
+	<p>The player must now attempt to pot a ball.
+		<li>If they pot press the "Pot" button, this puts their life through to the next round.</li>
+		<li>If they miss press the "Miss" button, this removes their life.</li>
+		<li>If they gain lives enter the number they gained and press "Add Lives".
+			<br/>A player gains a life for potting the black and an extra life for every ball they pot after the first, however a foul subtracts one life.</li>
+	</p>
+	<p>If you make a mistake you can correct it by using the "Promote", "Demote" and "X" buttons.
+		<li>"Promote" moves that life from the "To Be Drawn" section to the "Through" section.</li>
+		<li>"Demote" moves that life from the "Through" section to the "To Be Drawn" section</li>
+		<li>"X" removes that life from the game,</li>
+		You can also add lives back in using the "Add Player" section as before.
+	</p>
+	<p>The winner is the last player standing</p>
+</div>
+<div id="curDraw">
+	<div id="player"></div>
+	<button id="pot" class="control btn btn-default">Pot</button>
+	<button id="miss" class="control btn btn-default">Miss</button>
+	<button id="replace" class="control btn btn-default">Replace</button>
+	<div class="control"><input class="form-control" id="lives" type="number" value="1"/><button class="btn btn-default" onclick="controller.addLives()">Add Lives</button></div>
+</div>
+
+<div id="settings" class="control">
+	<button class="btn btn-default" id="start">Start</button>
+	<h3>Add Player:</h3>
+	<form id="addPlayer"><div id="lifeCount">No. Lives: <input class="form-control" type="number" id="noLives" value = "3"></input> Name: <input type="text" class="form-control" id="add"/><button  class="btn btn-default" type = "submit" >Add</button></form>
+</div>
+
+<div id="players"></div>

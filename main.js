@@ -22,47 +22,70 @@ app.get("/games", (req, res) => {
     }));
 });
 
+
+
 function handleWebSocket(ws, req) {
-    console.log("Got connection \"" + req.params.gameType + "\" \"" + req.params.gameId + "\" \"" + req.params.username + "\"");
+    try {
+        console.log("Got connection \"" + req.params.gameType + "\" \"" + req.params.gameId + "\" \"" + req.params.username + "\"");
 
-    let player = new model.Player(req.params.username, ws);
+        let player = new model.Player(req.params.username, ws);
 
-    let game;
+        console.log(player.username)
 
-    if (req.params.gameId) {
-        game = model.getGame(req.params.gameId);
+        let game;
+
+        if (req.params.gameId) {
+            game = model.getGame(req.params.gameId);
+        }
+
+        if (!game) {
+            game = model.startGame(req.params.gameType, player);
+        }
+
+        console.log("Created game")
+
+        if (game) {
+            ws.send(JSON.stringify({
+                type: "ID",
+                id: game.id,
+                gameType: game.type
+            }));
+
+            game.addPlayer(player);
+        } else {
+            ws.send("Error starting game");
+            ws.close();
+        }
+
+        ws.on('message', function (msg) {
+            try {
+                msg = JSON.parse(msg);
+                console.log(msg);
+                game.handleMsg(msg, player);
+            } catch (ex) {
+                console.log(ex);
+            }
+        });
+
+        ws.on('close', function () {
+            try {
+                game.handleClose(player);
+            } catch (ex) {
+                console.log(ex);
+            }
+        });
+
+        ws.on('error', function (err) {
+            try {
+                console.err(err);
+                game.handleError(err, player);
+            } catch (ex) {
+                console.log(ex);
+            }
+        });
+    } catch (ex) {
+        console.log(ex);
     }
-
-    if (!game) {
-        game = new model.startGame(req.params.gameType);
-    }
-
-    if (game) {
-        ws.send(JSON.stringify({
-            type: "ID",
-            id: game.id,
-            gameType: game.type
-        }));
-
-        game.addPlayer(player);
-    } else {
-        ws.send("Error starting game");
-        ws.close();
-    }
-
-    ws.on('message', function (msg) {
-        msg = JSON.parse(msg);
-        game.handleMsg(msg, player);
-    });
-
-    ws.on('close', function () {
-        game.handleClose(player);
-    });
-
-    ws.on('error', function (err) {
-        console.err(err);
-        game.handleError(err, player);
-    });
 }
 
 app.ws("/:gameType/:username/:gameId", handleWebSocket);
@@ -71,5 +94,5 @@ app.ws("/:gameType/:username", handleWebSocket);
 const port = process.env.PORT ? process.env.PORT : 8080;
 
 app.listen(port, () => {
-    console.log("Hosted here localhost:" + port);
+    console.log("Hosted here http://localhost:" + port);
 })

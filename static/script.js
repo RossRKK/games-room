@@ -1,7 +1,8 @@
 "use strict";
 
 var gameTypes = {
-    WouldYouRather: WouldYouRather
+    WouldYouRather: WouldYouRather,
+    Killer: Killer
 }
 
 var gameType = "WouldYouRather";
@@ -10,25 +11,36 @@ var ws;
 
 var user;
 
+function joinGame(user, gameId) {
+    ws = openWebSocket(null, user, gameId);
+
+    handleWebSocket(ws);
+
+    $("#join").hide();
+
+    $("#game").show();
+}
+
 $(document).ready(function () {
-    $("#game").hide();
+    if (window.location.pathname) {
+        var parts = window.location.pathname.split('/');
+        joinGame(parts[0], parts[1]);
+    } else {
+        $("#game").hide();
 
-    $("#join-btn").on("click", function (e) {
-        var user = $("#name").val();
-        var gameId = $("#game-id").val();
-        ws = openWebSocket(null, user, gameId);
+        $("#join-btn").on("click", function (e) {
+            var user = $("#name").val();
+            var gameId = $("#game-id").val();
 
-        handleWebSocket(ws);
-
-        $("#join").hide();
-
-        $("#game").show();
-    });
+            joinGame(user, gameId);
+        });
+    }
 
     var games = $.get("/games").done(function (games) {
         console.log(games);
         addGameButtons(games);
     })
+
 });
 
 function addGameButtons(games) {
