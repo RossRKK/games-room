@@ -236,7 +236,7 @@ var Killer = (function() {
 
         function remove(player, through) {
             ws.send(JSON.stringify({
-                type: "remove",
+                type: "removePlayer",
                 player: player,
                 through: through
             }));

@@ -122,6 +122,16 @@ class Killer extends Game.AdminGame {
         this.draw();
     }
 
+    restoreDrawnPlayer(player) {
+        this.currentPlayer = this.toBeDrawn.indexOf(player);
+
+        //if the operation performed removed the last instance of that player
+        //do a replace
+        if (this.currentPlayer === -1) {
+            this.replace();
+        }
+    }
+
     addPoolPlayer(name) {
         console.log(this.players)
         this.players.push(name);
@@ -134,16 +144,75 @@ class Killer extends Game.AdminGame {
         });
     }
 
-    removePoolPlayer(name) {
+    removePoolPlayer(player, through) {
+        try {
+            if (this.hasStarted) {
+                if (through) {
+                    let index = this.through.indexOf(player);
+                    //remove the player from the list
+            	    this.through.splice(index, 1);
+                } else {
+                    let curPlayer = this.toBeDrawn[this.currentPlayerIndex];
+                    let index = this.toBeDrawn.indexOf(player);
+                    //remove the player from the list
+            	    this.toBeDrawn.splice(index, 1);
 
+                    //it is necessary to call replace, as the currentPlayer index
+                    //will now be wrong
+                    //this.replace();
+                    this.restoreDrawnPlayer(curPlayer);
+                }
+            } else {
+                let index = this.players.indexOf(player);
+                //remove the player from the list
+                this.players.splice(index, 1);
+            }
+        } catch (e) {}
+
+        this.sendMsgToAll({
+            type: "admin",
+            status: this.status()
+        });
     }
 
-    putThrough(name) {
+    putThrough(player) {
+        try {
+            let curPlayer = this.toBeDrawn[this.currentPlayerIndex];
+            let index = this.toBeDrawn.indexOf(player);
+            //remove the player from the list
+            this.toBeDrawn.splice(index, 1);
 
+            //it is necessary to call replace, as the currentPlayer index
+            //will now be wrong
+            //this.replace();
+            this.restoreDrawnPlayer(curPlayer);
+        } catch (e) {}
+
+        this.through.push(player);
+        this.sendMsgToAll({
+            type: "admin",
+            status: this.status()
+        });
     }
 
-    demote(name) {
+    demote(player) {
+        try {
+            let index = this.through.indexOf(player);
+            //remove the player from the list
+    	    this.through.splice(index, 1);
+        } catch (e) {}
+        let curPlayer = this.toBeDrawn[this.currentPlayerIndex];
+        this.toBeDrawn.push(player);
 
+        //it is necessary to call replace, as the currentPlayer index
+        //will now be wrong
+        //this.replace();
+
+        this.restoreDrawnPlayer(curPlayer);
+        this.sendMsgToAll({
+            type: "admin",
+            status: this.status()
+        });
     }
 
     status() {
@@ -165,7 +234,6 @@ class Killer extends Game.AdminGame {
             });
             return;
         }
-        console.log(this.admins)
         if (this.isAdmin(player.username)) {
             switch (msg.type) {
                 case "pot":
@@ -184,7 +252,7 @@ class Killer extends Game.AdminGame {
                     this.addPoolPlayer(msg.player);
                     break;
                 case "removePlayer":
-                    this.removePoolPlayer(msg.player);
+                    this.removePoolPlayer(msg.player, msg.through);
                     break;
                 case "putThrough":
                     this.putThrough(msg.player);

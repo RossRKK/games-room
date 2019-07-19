@@ -45,7 +45,6 @@ class Player {
     }
 
     sendMsg(msg) {
-        console.log(msg);
         this.ws.send(JSON.stringify(msg));
     }
 }
