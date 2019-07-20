@@ -184,14 +184,14 @@ var Crumbs = (function () {
         }
 
         function players(ps) {
-            var players = document.getElementById("players");
+            var players = $("#players");
 
-            players.innerHTML = "";
+            players.empty();
 
             ps.forEach(function (p) {
-                var div = document.createElement("div");
-                div.innerText =  (p.isCzar ? "🂠" : (p.hasPlayed ? "✔" : "✖")) + " " + p.username + ": " + p.score;
-                players.appendChild(div);
+                $("<div/>", {
+                    text: (p.isCzar ? "🂠" : (p.hasPlayed ? "✔" : "✖")) + " " + p.username + ": " + p.score
+                }).appendTo(players);
             });
         }
 
@@ -270,10 +270,6 @@ var Crumbs = (function () {
     }());
 
     function init() {
-        // $("#game").load(gameType + "/game.html", function () {
-        //     console.log("Ready");
-        //
-        // });
 
         var game = $("#game");
 
@@ -296,7 +292,7 @@ var Crumbs = (function () {
         }).appendTo(game);
 
         $("<div/>", {
-            id: "white"
+            id: "whites"
         }).appendTo(game);
 
         view.init();

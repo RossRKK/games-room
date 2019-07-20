@@ -28,14 +28,14 @@ $(document).ready(function () {
         joinGame(parts[0], parts[1]);
     } else {
         $("#game").hide();
-
-        $("#join-btn").on("click", function (e) {
-            var user = $("#name").val();
-            var gameId = $("#game-id").val();
-
-            joinGame(user, gameId);
-        });
     }
+
+    $("#join-btn").on("click", function (e) {
+        var user = $("#name").val();
+        var gameId = $("#game-id").val();
+
+        joinGame(user, gameId);
+    });
 
     var games = $.get("/games").done(function (games) {
         console.log(games);

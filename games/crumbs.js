@@ -47,10 +47,18 @@ class CrumbsPlayer extends Game.Player {
     constructor(username, ws) {
         super(username, ws);
 
+
+
         this.hasPlayed = false;
         this.hand = [];
 
         this.score = 0;
+    }
+
+    dealHand(deck) {
+        while (this.hand.length < HAND_SIZE) {
+            this.hand.push(randomCard(deck));
+        }
     }
 
     /**
@@ -102,7 +110,9 @@ class Crumbs extends Game.Game {
     constructor(gameId, creator) {
         super(gameId, creator);
 
+        //used by games room code
         this.type = type;
+        this.Player = CrumbsPlayer;
 
         this.playerMap = {};
 
@@ -129,7 +139,7 @@ class Crumbs extends Game.Game {
 
     startRound() {
         this.responses = [];
-        //deal out some cards
+        //deal out some cards#
         this.players.forEach((p) => {
             this.hasPlayed = false;
             p.dealHand(this.whites);
@@ -240,9 +250,7 @@ class Crumbs extends Game.Game {
      *  Add a client to the list of subscribed clients.
      *  @param client The client to add.
      */
-    addPlayer(nonCrumbsPlayer) {
-        let player = new CrumbsPlayer(nonCrumbsPlayer.username, nonCrumbsPlayer.ws);
-        this.playerMap[nonCrumbsPlayer.username] = player;
+    addPlayer(player) {
         this.players.push(player);
 
         if (this.hasStarted) {
@@ -257,9 +265,7 @@ class Crumbs extends Game.Game {
      *  Remove a client from the list of subscribed clients
      *  @param client The client to remove.
      */
-    removePlayer(nonCrumbsPlayer) {
-        let player = this.playerMap[nonCrumbsPlayer.username];
-        delete  this.playerMap[nonCrumbsPlayer.username];
+    removePlayer(player) {
         let index = this.players.indexOf(player);
         if (index > -1) {
             this.players.splice(index, 1);
@@ -275,11 +281,10 @@ class Crumbs extends Game.Game {
         }
     }
 
-    handleMessage(msg, nonCrumbsPlayer) {
-        let player = this.playerMap[nonCrumbsPlayer.username];
-        console.log(msg)
+    handleMsg(msg, player) {
+        this.log(msg.type);
         //handle incoming messages from clients
-        switch (msg.action) {
+        switch (msg.type) {
             case "start":
                 this.startRound();
                 break;

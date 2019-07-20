@@ -29,9 +29,8 @@ function handleWebSocket(ws, req) {
     try {
         console.log("Got connection \"" + req.params.gameType + "\" \"" + req.params.gameId + "\" \"" + req.params.username + "\"");
 
-        let player = new Game.Player(req.params.username, ws);
-
-        console.log(player.username)
+        // let player = new Game.Player(req.params.username, ws);
+        let player;
 
         let game;
 
@@ -43,9 +42,10 @@ function handleWebSocket(ws, req) {
             game = model.startGame(req.params.gameType, player);
         }
 
-        console.log("Created game")
-
         if (game) {
+            //create a player of type matching the game
+            player = new game.Player(req.params.username, ws);
+
             ws.send(JSON.stringify({
                 type: "ID",
                 id: game.id,
@@ -61,7 +61,6 @@ function handleWebSocket(ws, req) {
         ws.on('message', function (msg) {
             try {
                 msg = JSON.parse(msg);
-                console.log(msg);
                 game.handleMsg(msg, player);
             } catch (ex) {
                 console.log(ex);

@@ -1,3 +1,22 @@
 #game {
     display: none;
 }
+
+.white {
+    background-color: #FFFFFF;
+    color: #000000;
+    margin: 1em;
+    padding: 1.5em;
+    border-radius: 2em;
+    border-style: solid;
+    border-color: #CCC;
+    cursor: pointer;
+}
+
+.black {
+    background-color: #000000;
+    color: #FFFFFF;
+    margin: 1em;
+    padding: 1.5em;
+    border-radius: 2em;
+}

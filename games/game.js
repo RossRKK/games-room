@@ -15,6 +15,12 @@ class Game {
         this.id = gameId;
 
         this.allPlayers = {};
+
+        this.Player = Player;
+    }
+
+    log(msg) {
+        console.log(this.id + ": " + msg);
     }
 
     addPlayer(player) {
@@ -57,13 +63,12 @@ exports.Game = Game;
 
 
 class AdminGame extends Game {
-    constructor(gameId, creator) {
+    constructor(gameId) {
         super(gameId);
 
-        this.admins = {
-        };
+        this.admins = {};
 
-        this.admins[creator.username] = creator;
+        // this.admins[creator.username] = creator;
     }
 
     removePlayer(player) {
@@ -72,7 +77,8 @@ class AdminGame extends Game {
     }
 
     isAdmin(username) {
-        return this.admins[username] !== undefined;
+        // return this.admins[username] !== undefined;
+        return true; //TODO check diabled because admin can't be passed in to constructor
     }
 
     addAdmin(player) {

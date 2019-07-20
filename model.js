@@ -14,13 +14,13 @@ function generateGameId() {
     return id;
 }
 
-exports.startGame = function (gameType, player) {
+exports.startGame = function (gameType) {
     //check if a game type with that id exists
     if (gameTypes[gameType]) {
         let id = generateGameId();
         console.log(id);
 
-        let game = new gameTypes[gameType].Game(id, player);
+        let game = new gameTypes[gameType].Game(id);
         onGoingGames[id] = game;
 
         return game;
