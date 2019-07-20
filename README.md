@@ -1,4 +1,4 @@
-# games-room
+# Games Room
 
 Games room is a system that allows multiple different group games to be implmented with the same server. 
 Each game takes place in a game "room", each with a different ID. Multiple people can use this ID to join the same game and play together.
