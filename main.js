@@ -8,6 +8,7 @@ const model = require("./model.js");
 
 const controller = require("./controller.js");
 
+const Game = require("./games/game.js");
 
 app.use(express.static("static"));
 
@@ -28,7 +29,7 @@ function handleWebSocket(ws, req) {
     try {
         console.log("Got connection \"" + req.params.gameType + "\" \"" + req.params.gameId + "\" \"" + req.params.username + "\"");
 
-        let player = new model.Player(req.params.username, ws);
+        let player = new Game.Player(req.params.username, ws);
 
         console.log(player.username)
 

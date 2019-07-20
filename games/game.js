@@ -1,3 +1,15 @@
+class Player {
+    constructor (username, ws) {
+        this.username = username;
+        this.ws = ws;
+    }
+
+    sendMsg(msg) {
+        this.ws.send(JSON.stringify(msg));
+    }
+}
+exports.Player = Player;
+
 class Game {
     constructor(gameId) {
         this.id = gameId;
@@ -41,6 +53,9 @@ class Game {
     }
 }
 
+exports.Game = Game;
+
+
 class AdminGame extends Game {
     constructor(gameId, creator) {
         super(gameId);
@@ -74,5 +89,3 @@ class AdminGame extends Game {
 }
 
 exports.AdminGame = AdminGame;
-
-exports.Game = Game;

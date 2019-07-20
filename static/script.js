@@ -2,7 +2,8 @@
 
 var gameTypes = {
     WouldYouRather: WouldYouRather,
-    Killer: Killer
+    Killer: Killer,
+    Crumbs: Crumbs
 }
 
 var gameType = "WouldYouRather";

@@ -6,3 +6,6 @@ exports[scoreBoard.id] = scoreBoard;
 
 const killer = require("./killer.js");
 exports[killer.id] = killer;
+
+const crumbs = require("./crumbs-against-pool-soc.js");
+exports[crumbs.id] = crumbs;
