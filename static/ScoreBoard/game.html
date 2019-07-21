@@ -1,0 +1,67 @@
+<style>
+    .scoreboard {
+        border-radius: 2em;
+        text-align: center;
+    }
+
+    .green {
+        background-color: #01bf34;
+    }
+
+    .yellow {
+        background-color: #e8e804;
+    }
+
+    .red {
+        background-color: #e81704;
+    }
+
+    #shot-clock {
+        text-align: center;
+    }
+
+    .controlls .btn {
+        width: 100%;
+    }
+
+</style>
+
+<div class="scoreboard row">
+    <div id="player1" class="col-5 green player">Player 1</div>
+    <div id="score" class="col-2">-</div>
+    <div id="player2" class="col-5 green player">Player 2</div>
+</div>
+
+<div class="row">
+    <div id="shot-clock">
+    </div>
+</div>
+
+<div class="controlls">
+    <div class="row">
+        <div class="col">
+            <div class="row">
+                <div class="col"><div class="btn btn-danger" onclick="ScoreBoard.p1Red()">Red</div></div>
+                <div class="col"><div class="btn btn-success" onclick="ScoreBoard.resetColours()">Reset</div></div>
+                <div class="col"><div class="btn btn-warning" onclick="ScoreBoard.p2Red()">Yellow</div></div>
+                <div class="col"><div class="btn btn-primary" onclick="ScoreBoard.p1Score(true)">+</div></div>
+                <div class="col"><div class="btn btn-primary" onclick="ScoreBoard.p1Score(false)">-</div></div>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="row">
+                <div class="col"><div class="btn btn-primary" onclick="ScoreBoard.resetClock()">Reset</div></div>
+                <div class="col"><div class="btn btn-primary" onclick="ScoreBoard.pauseClock()" id="pause">Pause</div></div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="row">
+                <div class="col"><div class="btn btn-primary" onclick="ScoreBoard.p2Score(true)">+</div></div>
+                <div class="col"><div class="btn btn-primary" onclick="ScoreBoard.p2Score(false)">-</div></div>
+                <div class="col"><div class="btn btn-danger" onclick="ScoreBoard.p2Red()">Red</div></div>
+                <div class="col"><div class="btn btn-success" onclick="ScoreBoard.resetColours()">Reset</div></div>
+                <div class="col"><div class="btn btn-warning" onclick="ScoreBoard.p1Red()">Yellow</div></div>
+            </div>
+        </div>
+    </div>
+</div>
