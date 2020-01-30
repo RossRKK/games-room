@@ -102,7 +102,7 @@ class AdminGame extends Game {
     handleMsg(msg, player) {
         //player must be admin to perform any action
         if (!this.isAdmin(player.username)) {
-            this.log(player.username + " is not admin")
+            this.log(player.username + " is not admin");
             return false;
         }
 
