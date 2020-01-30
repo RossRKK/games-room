@@ -69,7 +69,13 @@ function handleWebSocket(ws, req) {
         ws.on('message', function (msg) {
             try {
                 msg = JSON.parse(msg);
-                game.handleMsg(msg, player);
+
+                //ignore ping messages
+                if (msg.type !== "ping") {
+                    game.handleMsg(msg, player);
+                }
+
+                model.resetTimeoutForGame(game.id);
             } catch (ex) {
                 console.log(ex);
             }

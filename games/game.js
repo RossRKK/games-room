@@ -32,6 +32,8 @@ class Game {
     }
 
     removePlayer(player) {
+        //close the web socket
+        player.ws.close();
         delete this.allPlayers[player.username];
     }
 

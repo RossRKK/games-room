@@ -14,6 +14,36 @@ function generateGameId() {
     return id;
 }
 
+const GAME_TIMEOUT = 10 * /*60 */ 1000; //10 mins
+
+//kill a game, after time has elapsed
+function killGame(id) {
+    console.log("Killing " + id);
+    //close all websockets
+    let game = onGoingGames[id];
+
+    Object.values(game.allPlayers).forEach((p, i) => {
+        p.ws.close();
+    });
+
+    //delete the game from memory
+    delete onGoingGames[id];
+}
+
+function resetTimeout(game) {
+    //clear existing timeout
+    if (game.timeout) {
+        clearTimeout(game.timeout);
+    }
+
+    //create a new one
+    game.timeout = setTimeout(killGame, GAME_TIMEOUT, game.id);
+}
+
+exports.resetTimeoutForGame = function (id) {
+    resetTimeout(onGoingGames[id]);
+}
+
 exports.startGame = function (gameType) {
     //check if a game type with that id exists
     if (gameTypes[gameType]) {
@@ -22,6 +52,8 @@ exports.startGame = function (gameType) {
 
         let game = new gameTypes[gameType].Game(id);
         onGoingGames[id] = game;
+
+        resetTimeout(game);
 
         return game;
     } else {

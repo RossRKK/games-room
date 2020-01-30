@@ -85,7 +85,17 @@ function openWebSocket(gameType, username, gameId) {
     var url = new_uri + "/"+ encodeURIComponent(gameType) + "/" + encodeURIComponent(username)
      + (gameId ? ("/" + encodeURIComponent(gameId)) : "");
      console.log(url)
-    return new WebSocket(url);
+    var ws =  new WebSocket(url);
+
+    //setup auto-ping
+    ws.pingInterval = setInterval(function() {
+        console.log("ping");
+        ws.send(JSON.stringify({
+            type: "ping"
+        }));
+    }, 3000);
+
+    return ws;
 }
 
 function handleWebSocket(ws) {
@@ -107,6 +117,7 @@ function handleWebSocket(ws) {
     }
 
     ws.onclose = function () {
+        clearInterval(ws.pingInterval);
         $("#join").show();
         $("#game").hide();
         $("#game").empty();

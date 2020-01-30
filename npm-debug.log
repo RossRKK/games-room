@@ -24,7 +24,7 @@
 14 verbose stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:209:5)
 15 verbose pkgid stacs-hack-v@1.0.0
 16 verbose cwd /mnt/Data/dev/web/games-room
-17 error Linux 4.15.0-48-generic
+17 error Linux 4.15.0-74-generic
 18 error argv "/usr/bin/node" "/usr/bin/npm" "start"
 19 error node v8.10.0
 20 error npm  v3.5.2
