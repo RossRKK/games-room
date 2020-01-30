@@ -27,7 +27,7 @@ var Crumbs = (function () {
             switch (msg.type) {
                 case "admin":
                     controlEnabled = msg.isAdmin;
-                    view.start(controlEnabled);
+                    view.isAdmin(controlEnabled);
                     break;
                 case "czar":
                     view.czar(true);
@@ -78,6 +78,20 @@ var Crumbs = (function () {
             }));
         }
 
+        function addAdmin(username) {
+            ws.send(JSON.stringify({
+                type: "mk-admin",
+                player: username
+            }));
+        }
+
+        function removeAdmin(username) {
+            ws.send(JSON.stringify({
+                type: "rm-admin",
+                player: username
+            }));
+        }
+
 
         function newGame() {
             return $.ajax({
@@ -103,6 +117,8 @@ var Crumbs = (function () {
             start: start,
             response: response,
             decision: decision,
+            addAdmin: addAdmin,
+            removeAdmin: removeAdmin,
             handleMessage: handleMessage
         }
     })();
@@ -111,15 +127,21 @@ var Crumbs = (function () {
     var view = function () {
 
         function init() {
-            $("#start").show();
+            $("#start").hide();
+            $("#add-admin").hide();
+            $("#rm-admin").hide();
     		$("#chooseGame").show();
         }
 
-    	function start(isAdmin) {
+    	function isAdmin(isAdmin) {
             if (isAdmin) {
                 $("#start").show();
+                $("#add-admin").show();
+                $("#rm-admin").show();
             } else {
                 $("#start").hide();
+                $("#add-admin").hide();
+                $("#rm-admin").hide();
             }
     	}
 
@@ -214,7 +236,7 @@ var Crumbs = (function () {
 
     	return {
             init: init,
-    		start: start,
+    		isAdmin: isAdmin,
             game: game,
             black: black,
             whites: whites,
@@ -230,13 +252,22 @@ var Crumbs = (function () {
     var controller = (function () {
         function init() {
             $("#start").on("click", start);
-            $("#start").hide();
+            $("#add-admin").on("click", addAdmin);
+            $("#rm-admin").on("click", removeAdmin);
         }
 
     	//Start the game
     	function start() {
         	model.start();
     	}
+
+        function addAdmin() {
+            model.addAdmin(prompt("Username:"));
+        }
+
+        function removeAdmin() {
+            model.removeAdmin(prompt("Username:"));
+        }
 
         function newGame() {
             var username = $("#username").val();
@@ -289,6 +320,18 @@ var Crumbs = (function () {
             id: "start",
             class: "btn btn-default",
             text: "Start"
+        }).appendTo(game);
+
+        $("<button/>", {
+            id: "add-admin",
+            class: "btn btn-default",
+            text: "Add Admin"
+        }).appendTo(game);
+
+        $("<button/>", {
+            id: "rm-admin",
+            class: "btn btn-default",
+            text: "Remove Admin"
         }).appendTo(game);
 
         $("<div/>", {

@@ -59,7 +59,7 @@ function handleWebSocket(ws, req) {
 
             //make the player an admin
             if (isCreator && game.addAdmin) {
-                game.addAdmin(player);
+                game.addAdmin(player.username);
             }
         } else {
             ws.send("Error starting game");

@@ -47,7 +47,7 @@ class Game {
 
     //should be overriden
     handleMsg(msg, player) {
-        player.sendMsg(msg);
+        return false; //indicates super class should proceded, npo action taken
     }
 
     handleClose(player) {
@@ -77,10 +77,10 @@ class AdminGame extends Game {
         return username in this.admins;
     }
 
-    addAdmin(player) {
-        this.admins[player.username] = player;
+    addAdmin(username) {
+        this.admins[username] = this.allPlayers[username];
 
-        player.sendMsg({
+        this.allPlayers[username].sendMsg({
             type: "admin",
             isAdmin: true
         });
@@ -89,7 +89,7 @@ class AdminGame extends Game {
     removeAdmin(username) {
         delete this.admins[username];
 
-        player.sendMsg({
+        this.allPlayers[username].sendMsg({
             type: "admin",
             isAdmin: false
         });
@@ -97,6 +97,29 @@ class AdminGame extends Game {
 
     sendMsgToAdmins(msg) {
         this.sendMsgToGroup(msg, this.admins);
+    }
+
+    handleMsg(msg, player) {
+        //player must be admin to perform any action
+        if (!this.isAdmin(player.username)) {
+            this.log(player.username + " is not admin")
+            return false;
+        }
+
+        switch (msg.type) {
+            case "mk-admin":
+                this.addAdmin(msg.player);
+                break;
+            case "rm-admin":
+                this.removeAdmin(msg.player);
+                break;
+            default:
+                //indicate no action taken
+                return false;
+        }
+
+        //action was taken
+        return true;
     }
 }
 

@@ -112,8 +112,6 @@ class Crumbs extends Game.AdminGame {
         this.type = type;
         this.Player = CrumbsPlayer;
 
-        this.playerMap = {};
-
         this.hasStarted = false;
         this.whites = [];
         this.blacks = [];
@@ -203,7 +201,7 @@ class Crumbs extends Game.AdminGame {
             if (czar) {
                 czar.pushOptions(this.black, this.responses);
             } else {
-                console.log("Czar index is " + this.czarIndex + " there are " + this.players.length + " players");
+                this.log("Czar index is " + this.czarIndex + " there are " + this.players.length + " players");
             }
         }
     }
@@ -249,6 +247,7 @@ class Crumbs extends Game.AdminGame {
      *  @param client The client to add.
      */
     addPlayer(player) {
+        super.addPlayer(player);
         this.players.push(player);
 
         if (this.hasStarted) {
@@ -280,6 +279,11 @@ class Crumbs extends Game.AdminGame {
     }
 
     handleMsg(msg, player) {
+        //let the super class handle the message first
+        if (super.handleMsg(msg, player)) {
+            return true;
+        }
+
         this.log(msg.type);
         //handle incoming messages from clients
         switch (msg.type) {
@@ -300,9 +304,11 @@ class Crumbs extends Game.AdminGame {
                 //ignore ping messages
                 break;
             default:
-                console.log("Unsupported action: " + msg.action);
-                break;
+                return false; //no action was taken
         }
+
+        //an action was taken
+        return true;
     }
 }
 
