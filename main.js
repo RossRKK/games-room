@@ -23,8 +23,6 @@ app.get("/games", (req, res) => {
     }));
 });
 
-
-
 function handleWebSocket(ws, req) {
     try {
         console.log("Got connection \"" + req.params.gameType + "\" \"" + req.params.gameId + "\" \"" + req.params.username + "\"");
@@ -38,8 +36,12 @@ function handleWebSocket(ws, req) {
             game = model.getGame(req.params.gameId);
         }
 
+        //whether the requesting player is creating the game
+        let isCreator = false;
+
         if (!game) {
-            game = model.startGame(req.params.gameType, player);
+            game = model.startGame(req.params.gameType);
+            isCreator = true;
         }
 
         if (game) {
@@ -50,9 +52,15 @@ function handleWebSocket(ws, req) {
                 type: "ID",
                 id: game.id,
                 gameType: game.type
+
             }));
 
             game.addPlayer(player);
+
+            //make the player an admin
+            if (isCreator && game.addAdmin) {
+                game.addAdmin(player);
+            }
         } else {
             ws.send("Error starting game");
             ws.close();

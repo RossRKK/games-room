@@ -8,7 +8,7 @@ var Crumbs = (function () {
         /**
          * Whether the controls should be enabled.
          */
-        var controlEnabled = true;
+        var controlEnabled = false;
 
         /**
          * The current status of the game.
@@ -25,6 +25,10 @@ var Crumbs = (function () {
             view.game();
 
             switch (msg.type) {
+                case "admin":
+                    controlEnabled = msg.isAdmin;
+                    view.start(controlEnabled);
+                    break;
                 case "czar":
                     view.czar(true);
                     view.black(msg.black);
@@ -111,8 +115,12 @@ var Crumbs = (function () {
     		$("#chooseGame").show();
         }
 
-    	function start() {
-            $("#start").hide();
+    	function start(isAdmin) {
+            if (isAdmin) {
+                $("#start").show();
+            } else {
+                $("#start").hide();
+            }
     	}
 
         function game() {
@@ -222,12 +230,12 @@ var Crumbs = (function () {
     var controller = (function () {
         function init() {
             $("#start").on("click", start);
+            $("#start").hide();
         }
 
     	//Start the game
     	function start() {
         	model.start();
-            //view.start();
     	}
 
         function newGame() {

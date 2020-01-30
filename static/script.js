@@ -109,5 +109,9 @@ function handleWebSocket(ws) {
     ws.onclose = function () {
         $("#join").show();
         $("#game").hide();
+        $("#game").empty();
+
+        $("#header").text("Games Room");
+        $("#id").text("");
     }
 }

@@ -47,8 +47,6 @@ class CrumbsPlayer extends Game.Player {
     constructor(username, ws) {
         super(username, ws);
 
-
-
         this.hasPlayed = false;
         this.hand = [];
 
@@ -106,7 +104,7 @@ class CrumbsPlayer extends Game.Player {
 }
 
 //TODO this handles players on it's own and should probably change to not do that
-class Crumbs extends Game.Game {
+class Crumbs extends Game.AdminGame {
     constructor(gameId, creator) {
         super(gameId, creator);
 
@@ -286,7 +284,9 @@ class Crumbs extends Game.Game {
         //handle incoming messages from clients
         switch (msg.type) {
             case "start":
-                this.startRound();
+                if (this.isAdmin(player.username)) {
+                    this.startRound();
+                }
                 break;
             case "response":
                 //the ball was potted
