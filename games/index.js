@@ -9,3 +9,6 @@ exports[killer.id] = killer;
 
 const crumbs = require("./crumbs.js");
 exports[crumbs.id] = crumbs;
+
+const videoSync = require("./video-sync.js");
+exports[videoSync.id] = videoSync;
