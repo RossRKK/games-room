@@ -5,7 +5,7 @@
   var host = "wss://games-room.herokuapp.com";
   // var host = "ws://localhost:8080";
 
-  var lock = false;
+  var lock = 0;
 
   var seekIgnore = 0;
 
@@ -31,7 +31,7 @@
 
         switch (msg.type) {
           case "update":
-            if (!lock) {
+            if (lock === 0) {
               seekIgnore++;
               video.currentTime = msg.time;
               if (msg.state === "PLAYING") {
@@ -40,7 +40,7 @@
                 video.pause();
               }
             } else {
-              lock = false;
+              lock++;
             }
             break;
           case "ID":
@@ -50,7 +50,7 @@
       }
 
       video.addEventListener('play', (event) => {
-        lock = true;
+        lock--;
         ws.send(JSON.stringify({
           type: "play",
           currentTime: video.currentTime
@@ -58,16 +58,16 @@
       });
 
       video.addEventListener('pause', (event) => {
-        lock = true;
         ws.send(JSON.stringify({
           type: "pause",
           currentTime: video.currentTime
         }));
+        lock--;
       });
 
       video.addEventListener('seeked', (event) => {
         if (seekIgnore === 0) {
-            lock = true;
+            lock--;
             ws.send(JSON.stringify({
               type: "seek",
               currentTime: video.currentTime
