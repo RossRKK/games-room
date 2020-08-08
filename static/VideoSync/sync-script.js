@@ -2,10 +2,12 @@
   "use strict";
   var gameType = "VideoSync";
 
-  //var host = "wss://games-room.herokuapp.com";
-  var host = "ws://localhost:8080";
+  var host = "wss://games-room.herokuapp.com";
+  // var host = "ws://localhost:8080";
 
   var lock = false;
+
+  var seekIgnore = 0;
 
   function start(username, gameId) {
       var url = host + "/"+ encodeURIComponent(gameType) + "/" + encodeURIComponent(username)
@@ -30,6 +32,7 @@
         switch (msg.type) {
           case "update":
             if (!lock) {
+              seekIgnore++;
               video.currentTime = msg.time;
               if (msg.state === "PLAYING") {
                 video.play();
@@ -63,12 +66,15 @@
       });
 
       video.addEventListener('seeked', (event) => {
-          lock = true;
-          ws.send(JSON.stringify({
-            type: "seek",
-            currentTime: video.currentTime
-          }));
+        if (seekIgnore === 0) {
+            lock = true;
+            ws.send(JSON.stringify({
+              type: "seek",
+              currentTime: video.currentTime
+            }));
+          }
       });
+      seekIgnore--;
   }
 
   var username = prompt("Username");
