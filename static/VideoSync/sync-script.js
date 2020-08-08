@@ -31,7 +31,7 @@
 
         switch (msg.type) {
           case "update":
-            if (lock === 0) {
+            if (lock) {
               seekIgnore++;
               video.currentTime = msg.time;
               if (msg.state === "PLAYING") {
@@ -58,11 +58,11 @@
       });
 
       video.addEventListener('pause', (event) => {
+        lock--;
         ws.send(JSON.stringify({
           type: "pause",
           currentTime: video.currentTime
         }));
-        lock--;
       });
 
       video.addEventListener('seeked', (event) => {
@@ -74,7 +74,6 @@
             }));
           }
       });
-      seekIgnore--;
   }
 
   var username = prompt("Username");
