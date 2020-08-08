@@ -1,58 +1,83 @@
-var gameType = "VideoSync";
+(function (){
+  "use strict";
+  var gameType = "VideoSync";
 
-var host = "ws://localhost:8080";
+  //var host = "wss://games-room.herokuapp.com";
+  var host = "ws://localhost:8080";
 
-var lock = false;
+  var lock = false;
 
-function start(username, gameId) {
+  function start(username, gameId) {
+      var url = host + "/"+ encodeURIComponent(gameType) + "/" + encodeURIComponent(username)
+       + (gameId ? ("/" + encodeURIComponent(gameId)) : "");
+       console.log(url)
+      var ws =  new WebSocket(url);
 
-    var url = host + "/"+ encodeURIComponent(gameType) + "/" + encodeURIComponent(username)
-     + (gameId ? ("/" + encodeURIComponent(gameId)) : "");
-     console.log(url)
-    var ws =  new WebSocket(url);
+      //setup auto-ping
+      ws.pingInterval = setInterval(function() {
+          console.log("ping");
+          ws.send(JSON.stringify({
+              type: "ping"
+          }));
+      }, 30000);
 
-    //setup auto-ping
-    ws.pingInterval = setInterval(function() {
-        console.log("ping");
-        ws.send(JSON.stringify({
-            type: "ping"
-        }));
-    }, 3000);
+      let video = document.querySelector('video');
 
-    let video = document.querySelector('video');
+      ws.onmessage = function (msg) {
+        msg = JSON.parse(msg.data);
+        console.log(msg);
 
-    ws.onmessage = function (msg) {
-      msg = JSON.parse(msg.data);
-      console.log(msg);
-
-      switch (msg.type) {
-        case "update":
-          if (!lock) {
-            video.currentTime = msg.time;
-            if (msg.state === "PLAYING") {
-              video.play();
+        switch (msg.type) {
+          case "update":
+            if (!lock) {
+              video.currentTime = msg.time;
+              if (msg.state === "PLAYING") {
+                video.play();
+              } else {
+                video.pause();
+              }
             } else {
-              video.pause();
+              lock = false;
             }
-          } else {
-            lock = false;
-          }
+            break;
+          case "ID":
+            alert("Joined Room " +  msg.id);
+            break;
+        }
       }
-    }
 
-    video.addEventListener('play', (event) => {
-      lock = true;
-      ws.send(JSON.stringify({
-        type: "play",
-        currentTime: video.currentTime
-      }));
-    });
+      video.addEventListener('play', (event) => {
+        lock = true;
+        ws.send(JSON.stringify({
+          type: "play",
+          currentTime: video.currentTime
+        }));
+      });
 
-    video.addEventListener('pause', (event) => {
-      lock = true;
-      ws.send(JSON.stringify({
-        type: "pause",
-        currentTime: video.currentTime
-      }));
-    });
-}
+      video.addEventListener('pause', (event) => {
+        lock = true;
+        ws.send(JSON.stringify({
+          type: "pause",
+          currentTime: video.currentTime
+        }));
+      });
+
+      video.addEventListener('seeked', (event) => {
+          lock = true;
+          ws.send(JSON.stringify({
+            type: "seek",
+            currentTime: video.currentTime
+          }));
+      });
+  }
+
+  var username = prompt("Username");
+
+  var roomCode = prompt("Room Code");
+
+  console.log(roomCode);
+
+  start(username, roomCode);
+
+  return start;
+})();

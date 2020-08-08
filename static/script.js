@@ -94,7 +94,7 @@ function openWebSocket(gameType, username, gameId) {
         ws.send(JSON.stringify({
             type: "ping"
         }));
-    }, 3000);
+    }, 30000);
 
     return ws;
 }

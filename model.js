@@ -14,7 +14,7 @@ function generateGameId() {
     return id;
 }
 
-const GAME_TIMEOUT = 10 * /*60 */ 1000; //10 mins
+const GAME_TIMEOUT = 10 * 60 * 1000; //10 mins
 
 //kill a game, after time has elapsed
 function killGame(id) {
@@ -65,6 +65,7 @@ exports.startGame = function (gameType) {
 
 exports.getGame = function (id) {
     id = id.toUpperCase();
+    console.log(Object.keys(onGoingGames))
     return onGoingGames[id];
 }
 
