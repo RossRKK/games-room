@@ -5,9 +5,9 @@
   var host = "wss://games-room.herokuapp.com";
   // var host = "ws://localhost:8080";
 
-  var lock = 0;
+  var localToIgnore = 0;
 
-  var seekIgnore = 0;
+  var networkToIgnore = 0;
 
   function start(username, gameId) {
       var url = host + "/"+ encodeURIComponent(gameType) + "/" + encodeURIComponent(username)
@@ -27,20 +27,24 @@
 
       ws.onmessage = function (msg) {
         msg = JSON.parse(msg.data);
-        console.log(msg);
 
         switch (msg.type) {
           case "update":
-            if (lock) {
-              seekIgnore++;
+            if (networkToIgnore === 0) {
+              localToIgnore++;
               video.currentTime = msg.time;
+
               if (msg.state === "PLAYING") {
+                console.log("auto play")
+                localToIgnore++;
                 video.play();
               } else {
+                console.log("auto pause")
+                localToIgnore++;
                 video.pause();
               }
             } else {
-              lock++;
+              networkToIgnore--;
             }
             break;
           case "ID":
@@ -49,31 +53,43 @@
         }
       }
 
-      video.addEventListener('play', (event) => {
-        lock--;
-        ws.send(JSON.stringify({
-          type: "play",
-          currentTime: video.currentTime
-        }));
-      });
+      var localEvent = (innerHandler, event) => {
+        networkToIgnore++;
+        if (localToIgnore === 0) {
+          innerHandler(event);
+        } else {
+          localToIgnore--;
+        }
+      };
 
-      video.addEventListener('pause', (event) => {
-        lock--;
-        ws.send(JSON.stringify({
-          type: "pause",
-          currentTime: video.currentTime
-        }));
-      });
+      var onPlay = (event) => {
+          ws.send(JSON.stringify({
+            type: "play",
+            currentTime: video.currentTime
+          }));
+      };
 
-      video.addEventListener('seeked', (event) => {
-        if (seekIgnore === 0) {
-            lock--;
+      video.addEventListener('play', (event) => { localEvent(onPlay, event) });
+
+      var onStop = (event) => {
+          ws.send(JSON.stringify({
+            type: "pause",
+            currentTime: video.currentTime
+          }));
+      }
+
+      video.addEventListener('pause', (event) => { localEvent(onStop, event) });
+      video.addEventListener('waiting', (event) => { localEvent(onStop, event) });
+      video.addEventListener('stalled', (event) => { localEvent(onStop, event) });
+
+      var onSeek = (event) => {
             ws.send(JSON.stringify({
               type: "seek",
               currentTime: video.currentTime
             }));
-          }
-      });
+      };
+
+      video.addEventListener('seeked', (event) => { localEvent(onSeek, event) });
   }
 
   var username = prompt("Username");
