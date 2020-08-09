@@ -9,11 +9,76 @@
 
   var networkToIgnore = 0;
 
+  function iframeRef(frameRef) {
+      return frameRef.contentWindow
+          ? frameRef.contentWindow.document
+          : frameRef.contentDocument
+  }
+
+  function determineVideo(doc) {
+    let videos = doc.querySelectorAll('video');
+
+    if (videos.length === 0) {
+      return null;
+    } else if (videos.length === 1) {
+      return videos[0];
+    } else {
+      //determine which video is the one we want,
+      //tested on iplayer
+      let hasBeenPlayed = (video) => {
+        return video.currentTime > 0;
+      };
+
+      let hasSrcAttribute = (video) => {
+        return video.src !== "";
+      };
+
+      let filters = [hasBeenPlayed, hasSrcAttribute];
+
+      let filteredVideos = Array.from(videos);
+
+      for (let i = 0; filteredVideos.length > 0 && i < filters.length; i++) {
+        filteredVideos = filteredVideos.filter(filters[i]);
+      }
+
+      return filteredVideos.length ? filteredVideos[0] : null;
+    }
+  }
+
+  let video = determineVideo(document);
+  //TODO some kind of video selection ui
+  //iplayter version
+  // let video = document.querySelectorAll('video')[1];
+
+  if (!video) {
+    let iframe = document.querySelector('iframe');
+
+    if (iframe) {
+      //alert("No video found. Try switching context to iframe");
+
+      let inside = iframeRef(iframe);
+
+      video = determineVideo(inside);
+
+      if (!video) {
+        alert("No video element found");
+        return;
+      }
+    } else {
+      alert("No video element found");
+
+      return;
+    }
+  }
+
+
+
   function start(username, gameId) {
-      var url = host + "/"+ encodeURIComponent(gameType) + "/" + encodeURIComponent(username)
-       + (gameId ? ("/" + encodeURIComponent(gameId)) : "");
-       console.log(url)
-      var ws =  new WebSocket(url);
+
+    var url = host + "/"+ encodeURIComponent(gameType) + "/" + encodeURIComponent(username)
+     + (gameId ? ("/" + encodeURIComponent(gameId)) : "");
+     console.log(url)
+    var ws =  new WebSocket(url);
 
       //setup auto-ping
       ws.pingInterval = setInterval(function() {
@@ -22,8 +87,6 @@
               type: "ping"
           }));
       }, 30000);
-
-      let video = document.querySelector('video');
 
       ws.onmessage = function (msg) {
         msg = JSON.parse(msg.data);
@@ -44,6 +107,7 @@
                 video.pause();
               }
             } else {
+              console.log("network ignored " + networkToIgnore);
               networkToIgnore--;
             }
             break;
@@ -54,24 +118,28 @@
       }
 
       var localEvent = (innerHandler, event) => {
-        networkToIgnore++;
         if (localToIgnore === 0) {
+          networkToIgnore++;
           innerHandler(event);
         } else {
+          console.log("local ignored " + localToIgnore);
           localToIgnore--;
         }
       };
 
       var onPlay = (event) => {
+          console.log("local play")
           ws.send(JSON.stringify({
             type: "play",
             currentTime: video.currentTime
           }));
       };
 
-      video.addEventListener('play', (event) => { localEvent(onPlay, event) });
+      // video.addEventListener('play', (event) => { localEvent(onPlay, event) });
+      video.addEventListener('playing', (event) => { localEvent(onPlay, event) });
 
       var onStop = (event) => {
+          console.log("local pause")
           ws.send(JSON.stringify({
             type: "pause",
             currentTime: video.currentTime
@@ -83,10 +151,11 @@
       video.addEventListener('stalled', (event) => { localEvent(onStop, event) });
 
       var onSeek = (event) => {
-            ws.send(JSON.stringify({
-              type: "seek",
-              currentTime: video.currentTime
-            }));
+          console.log("local seek")
+          ws.send(JSON.stringify({
+            type: "seek",
+            currentTime: video.currentTime
+          }));
       };
 
       video.addEventListener('seeked', (event) => { localEvent(onSeek, event) });
