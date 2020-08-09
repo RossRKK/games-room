@@ -20,36 +20,46 @@ class VideoSync extends Game.Game {
     this.time += 1/(updateInterval*1000);
   }
 
-  play(time) {
+  play(time, player) {
     this.state = PLAYING;
     this.time = time;
 
     this.interval = setInterval(this.incrementTime.bind(this), updateInterval);
 
-    this.pushState();
+    this.pushState(player);
   }
 
-  pause(time) {
+  pause(time, player) {
     this.state = PAUSED;
     this.time = time;
 
     clearInterval(this.interval);
 
-    this.pushState();
+    this.pushState(player);
   }
 
-  seek(time) {
+  seek(time, player) {
     this.time = time;
 
     this.pushState();
   }
 
-  pushState() {
-    this.sendMsgToAll({
+  pushState(causingPlayer) {
+
+    let allButCausingPlayer = {};
+
+    Object.keys(this.allPlayers).forEach((item, i) => {
+      if (item.username !== causingPlayer.username) {
+        allButCausingPlayer[item] = this.allPlayers[item];
+      }
+    });
+
+
+    this.sendMsgToGroup({
         type: "update",
         time: this.time,
         state: this.state
-    });
+    }, allButCausingPlayer);
   }
 
 
@@ -57,13 +67,13 @@ class VideoSync extends Game.Game {
     console.log(msg);
     switch (msg.type) {
         case "play":
-            this.play(msg.currentTime);
+            this.play(msg.currentTime, player);
             break;
         case "pause":
-            this.pause(msg.currentTime);
+            this.pause(msg.currentTime, player);
             break;
         case "seek":
-            this.seek(msg.currentTime);
+            this.seek(msg.currentTime, player);
             break;
         case "ping":
             //ignore ping messages

@@ -46,16 +46,11 @@
   }
 
   let video = determineVideo(document);
-  //TODO some kind of video selection ui
-  //iplayter version
-  // let video = document.querySelectorAll('video')[1];
 
   if (!video) {
     let iframe = document.querySelector('iframe');
 
     if (iframe) {
-      //alert("No video found. Try switching context to iframe");
-
       let inside = iframeRef(iframe);
 
       video = determineVideo(inside);
@@ -94,16 +89,16 @@
         switch (msg.type) {
           case "update":
             if (networkToIgnore === 0) {
-              localToIgnore++;
+              //localToIgnore++;
               video.currentTime = msg.time;
 
               if (msg.state === "PLAYING") {
                 console.log("auto play")
-                localToIgnore++;
+                //localToIgnore++;
                 video.play();
               } else {
                 console.log("auto pause")
-                localToIgnore++;
+                //localToIgnore++;
                 video.pause();
               }
             } else {
@@ -123,7 +118,7 @@
           innerHandler(event);
         } else {
           console.log("local ignored " + localToIgnore);
-          localToIgnore--;
+          //localToIgnore--;
         }
       };
 
