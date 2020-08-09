@@ -5,9 +5,6 @@
   var host = "wss://games-room.herokuapp.com";
   // var host = "ws://localhost:8080";
 
-  var localToIgnore = 0;
-
-  var networkToIgnore = 0;
 
   function iframeRef(frameRef) {
       return frameRef.contentWindow
@@ -66,7 +63,10 @@
     }
   }
 
+  const PAUSED = "PAUSED";
+  const PLAYING = "PLAYING";
 
+  let networkState = PAUSED;
 
   function start(username, gameId) {
 
@@ -88,42 +88,37 @@
 
         switch (msg.type) {
           case "update":
-            if (networkToIgnore === 0) {
-              //localToIgnore++;
               video.currentTime = msg.time;
 
-              if (msg.state === "PLAYING") {
-                console.log("auto play")
-                //localToIgnore++;
+              networkState = msg.state;
+
+              if (networkState === PLAYING && video.paused) {
+                console.log("auto play");
                 video.play();
-              } else {
-                console.log("auto pause")
-                //localToIgnore++;
+              } else if (networkState === PAUSED && !video.paused) {
+                console.log("auto pause");
                 video.pause();
+              } else {
+                console.log("local state matched network message");
               }
-            } else {
-              console.log("network ignored " + networkToIgnore);
-              networkToIgnore--;
-            }
             break;
           case "ID":
             alert("Joined Room " +  msg.id);
+            console.log(msg.id);
             break;
         }
       }
 
       var localEvent = (innerHandler, event) => {
-        if (localToIgnore === 0) {
-          networkToIgnore++;
+        let localState = video.paused ? PAUSED : PLAYING;
+
+        if (localState !== networkState) {
           innerHandler(event);
-        } else {
-          console.log("local ignored " + localToIgnore);
-          //localToIgnore--;
         }
       };
 
       var onPlay = (event) => {
-          console.log("local play")
+          console.log("sending play msg")
           ws.send(JSON.stringify({
             type: "play",
             currentTime: video.currentTime
@@ -134,7 +129,7 @@
       video.addEventListener('playing', (event) => { localEvent(onPlay, event) });
 
       var onStop = (event) => {
-          console.log("local pause")
+          console.log("sending pause msg")
           ws.send(JSON.stringify({
             type: "pause",
             currentTime: video.currentTime
@@ -146,7 +141,7 @@
       video.addEventListener('stalled', (event) => { localEvent(onStop, event) });
 
       var onSeek = (event) => {
-          console.log("local seek")
+          console.log("sending seek msg")
           ws.send(JSON.stringify({
             type: "seek",
             currentTime: video.currentTime
