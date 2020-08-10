@@ -1,0 +1,26 @@
+{
+
+  "manifest_version": 2,
+  "name": "Video Sync",
+  "version": "1.0",
+
+  "description": "Synchrnoises video streaming between multiple browsers",
+  "homepage_url": "https://games-room.herokuapp.com",
+
+  "permissions": [
+    "activeTab",
+    "notifications"
+  ],
+
+  "browser_action": {
+    "default_title": "Video Sync"
+  },
+
+  "background": {
+    "scripts": [
+      "browser-polyfill.js",
+      "video-sync.js"
+    ]
+  }
+
+}
