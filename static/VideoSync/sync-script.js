@@ -126,7 +126,7 @@
       };
 
       video.addEventListener('play', (event) => { localEvent(onPlay, event) });
-      video.addEventListener('playing', (event) => { localEvent(onPlay, event) });
+      // video.addEventListener('playing', (event) => { localEvent(onPlay, event) });
 
       var onStop = (event) => {
           console.log("sending pause msg")
@@ -137,8 +137,8 @@
       }
 
       video.addEventListener('pause', (event) => { localEvent(onStop, event) });
-      video.addEventListener('waiting', (event) => { localEvent(onStop, event) });
-      video.addEventListener('stalled', (event) => { localEvent(onStop, event) });
+      // video.addEventListener('waiting', (event) => { localEvent(onStop, event) });
+      // video.addEventListener('stalled', (event) => { localEvent(onStop, event) });
 
       var onSeek = (event) => {
           console.log("sending seek msg")
