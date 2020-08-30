@@ -12,6 +12,10 @@
           : frameRef.contentDocument
   }
 
+  function checkIfPlaying(video) {
+    return !video.paused && !video.ended;
+  }
+
   function determineVideo(doc) {
     let videos = doc.querySelectorAll('video');
 
@@ -83,21 +87,29 @@
           }));
       }, 30000);
 
-      ws.onmessage = function (msg) {
-        msg = JSON.parse(msg.data);
+      ws.onmessage = function (rawMsg) {
+        let msg = JSON.parse(rawMsg.data);
 
         switch (msg.type) {
           case "update":
-              video.currentTime = msg.time;
+              if (Math.abs(msg.time - video.currentTime) > 1) {
+                video.currentTime = msg.time;
+              }
 
               networkState = msg.state;
 
-              if (networkState === PLAYING && video.paused) {
-                console.log("auto play");
-                video.play();
-              } else if (networkState === PAUSED && !video.paused) {
-                console.log("auto pause");
-                video.pause();
+              let localState = checkIfPlaying(video) ? PLAYING : PAUSED;
+
+              if (networkState !== localState) {
+                if (networkState === PLAYING) {
+                  console.log("auto play");
+                  video.play();
+                } else if (networkState === PAUSED) {
+                  console.log("auto pause");
+                  video.pause();
+                } else {
+                  console.log("unknown network state " + networkState);
+                }
               } else {
                 console.log("local state matched network message");
               }
@@ -110,9 +122,11 @@
       }
 
       var localEvent = (innerHandler, event) => {
-        let localState = video.paused ? PAUSED : PLAYING;
+        let localState = checkIfPlaying(video) ? PLAYING : PAUSED;
 
         if (localState !== networkState) {
+          //the network should tell us to do this in a 2nd
+          //networkState = localState;
           innerHandler(event);
         }
       };
@@ -126,7 +140,7 @@
       };
 
       video.addEventListener('play', (event) => { localEvent(onPlay, event) });
-      // video.addEventListener('playing', (event) => { localEvent(onPlay, event) });
+      video.addEventListener('playing', (event) => { localEvent(onPlay, event) });
 
       var onStop = (event) => {
           console.log("sending pause msg")
@@ -137,8 +151,8 @@
       }
 
       video.addEventListener('pause', (event) => { localEvent(onStop, event) });
-      // video.addEventListener('waiting', (event) => { localEvent(onStop, event) });
-      // video.addEventListener('stalled', (event) => { localEvent(onStop, event) });
+      video.addEventListener('waiting', (event) => { localEvent(onStop, event) });
+      video.addEventListener('stalled', (event) => { localEvent(onStop, event) });
 
       var onSeek = (event) => {
           console.log("sending seek msg")
