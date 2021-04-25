@@ -12,3 +12,6 @@ exports[crumbs.id] = crumbs;
 
 const videoSync = require("./video-sync.js");
 exports[videoSync.id] = videoSync;
+
+const supply = require("./supply.js");
+exports[supply.id] = supply;

@@ -5,7 +5,8 @@ var gameTypes = {
     Killer: Killer,
     Crumbs: Crumbs,
     ScoreBoard: ScoreBoard,
-    VideoSync: VideoSync
+    VideoSync: VideoSync,
+    Supply: Supply
 }
 
 var gameType = "WouldYouRather";
