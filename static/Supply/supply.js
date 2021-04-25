@@ -19,15 +19,37 @@ var Supply = (function() {
     var col = wrapCol();
     cardDiv.append(col);
 
-    $('<span/>', {
-      class: 'row',
-      text: card.type
+    var headerRow = $('<div/>', {
+      class: 'row'
     }).appendTo(col);
 
-    $('<span/>', {
-      class: 'row',
-      text: card.value
+    var bodyRow = $('<span/>', {
+      class: 'row'
     }).appendTo(col);
+
+    var displayType = card.type;
+
+    switch (card.type) {
+      case 'MONEY':
+        displayType = '£';
+        break;
+      case 'DEFENCE':
+        displayType = '🛡';
+        break;
+      case 'ATTACK':
+        displayType = '⚔';
+        break;
+    }
+
+    wrapCol($('<div/>', {
+      class: 'card-type',
+      text: displayType
+    })).appendTo(headerRow);
+
+    wrapCol($('<div/>', {
+      class: 'card-value',
+      text: card.value
+    })).appendTo(bodyRow);
 
     return cardDiv;
   }
