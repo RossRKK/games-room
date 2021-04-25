@@ -78,8 +78,8 @@ class SupplyPlayer extends Game.Player {
     //this players current deck
     this.deck = [];
 
-    // //this players current 'play area'
-    // this.playArea = [];
+    //this players current 'play area'
+    this.playArea = [];
 
     //this players current defences
     this.defences = [];
@@ -185,7 +185,7 @@ class Supply extends Game.Game {
     super(gameId);
 
     this.type = type;
-    this.player = SupplyPlayer;
+    this.Player = SupplyPlayer;
 
     // populate supply deck
     this.deck = constructDeck();
@@ -254,13 +254,16 @@ class Supply extends Game.Game {
         health: player.health,
         hand: player.hand,
         defences: player.defences,
-        discard: player.discard
+        discard: player.discard,
+        playArea: player.playArea
       },
       opponent: {
         name: opponent.username,
         health: opponent.health,
         defences: opponent.defences,
-        discard: opponent.discard
+        discard: opponent.discard,
+        playArea: opponent.playArea,
+        handCount: opponent.hand.length
       },
       currentPlayer: this.currentPlayer,
       supplyRow: this.supplyRow,
