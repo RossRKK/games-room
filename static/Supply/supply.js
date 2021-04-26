@@ -201,6 +201,10 @@ var Supply = (function() {
       $('#player-attack-pool').text(status.player.attackPool);
       $('#player-money-pool').text(status.player.moneyPool);
 
+      $('#discard-count').text(status.player.mustDiscard);
+      //hide warning when non-zero
+      $('#dicard-warning').toggle(status.player.mustDiscard > 0);
+
       $('#supply-row .card').on('click', function (evt) {
         var targetIndex = evt.currentTarget.dataset.index;
         acquireCard(targetIndex);

@@ -34,7 +34,8 @@ const queenSpecial = (game, player, special) => {
 };
 
 const jackSpecial = (game, player, special) => {
-  //TODO this will require extra logic
+  let opponent = game.allPlayers[game.playOrder[0]];
+  opponent.mustDiscard++;
 };
 
 const MONEY = 'MONEY';
@@ -71,6 +72,9 @@ class SupplyPlayer extends Game.Player {
     this.moneyPool = 0;
     this.attackPool = 0;
     this.newDefence = []; //temporary pool that forms a new defensive barrier
+
+    //the number of cards this player must dicard at the start of their next turn
+    this.mustDiscard = 0;
 
     //TODO initialise with starting hand
     this.hand = [];
@@ -126,7 +130,7 @@ class SupplyPlayer extends Game.Player {
 
       //play the cards special
       if (card.special) {
-        card.special(game, player, special);
+        card.special(game, this, special);
       }
       this.cardsPlayed++;
       return true;
@@ -198,6 +202,11 @@ function constructDeck() {
     //defence cards
     deck.push(new Card(DEFENCE,i,i,i,null));
   }
+
+  deck.push(new Card(MONEY,10,15,'J',jackSpecial));
+  deck.push(new Card(MONEY,10,15,'J',jackSpecial));
+  deck.push(new Card(ATTACK,10,15,'J',jackSpecial));
+  deck.push(new Card(DEFENCE,10,15,'J',jackSpecial));
 
   deck.push(new Card(MONEY,10,15,'Q',queenSpecial));
   deck.push(new Card(MONEY,10,15,'Q',queenSpecial));
@@ -292,7 +301,8 @@ class Supply extends Game.Game {
         playArea: player.playArea,
         attackPool: player.attackPool,
         moneyPool: player.moneyPool,
-        newDefence: player.newDefence
+        newDefence: player.newDefence,
+        mustDiscard: player.mustDiscard
       },
       opponent: {
         name: opponent.username,
@@ -303,7 +313,8 @@ class Supply extends Game.Game {
         handCount: opponent.hand.length,
         attackPool: opponent.attackPool,
         moneyPool: opponent.moneyPool,
-        newDefence: opponent.newDefence
+        newDefence: opponent.newDefence,
+        mustDiscard: opponent.mustDiscard
       },
       currentPlayer: this.currentPlayer,
       supplyRow: this.supplyRow,
@@ -339,7 +350,14 @@ class Supply extends Game.Game {
           if (this.currentPlayer == player.username) {
             //a card was played
             let card = player.lookupFromHand(msg.cardIndex);
-            if (player.playCard(card, this, msg.special)) {
+            if (player.mustDiscard > 0) {
+              //discard without action
+              player.removeFromHand(msg.cardIndex);
+              player.mustDiscard--;
+              player.cardsPlayed++; //this counts as playing a card
+
+              this.sendStatus();
+            } else if (player.playCard(card, this, msg.special)) {
               player.removeFromHand(msg.cardIndex);
 
               this.sendStatus();
@@ -435,7 +453,7 @@ class Supply extends Game.Game {
               }
               this.sendStatus();
             } else {
-              this.rejectAction(player, 'There must be 3 speical or money cards to scrap the supply row');
+              this.rejectAction(player, 'There must be 3 special or money cards to scrap the supply row');
             }
           } else {
             this.rejectAction(player, 'It is not your turn');
