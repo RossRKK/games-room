@@ -21,19 +21,20 @@ function shuffle(array) {
 }
 
 const aceSpecial = (game, player, special) => {
-
+  //TODO this will require extra logic
 };
 
 const kingSpecial = (game, player, special) => {
-
+  player.health += 5;
 };
 
 const queenSpecial = (game, player, special) => {
-
+  player.draw(1);
+  player.cardsPlayed -= 1;
 };
 
 const jackSpecial = (game, player, special) => {
-
+  //TODO this will require extra logic
 };
 
 const MONEY = 'MONEY';
@@ -42,7 +43,8 @@ const DEFENCE = 'DEFENCE';
 const cardTypes = [MONEY, ATTACK, DEFENCE];
 
 class Card {
-  constructor(type, value, cost, special) {
+  constructor(type, value, cost, displayValue, special) {
+    this.displayValue = displayValue;
     this.type = type;
     this.value = value;
     this.cost = cost;
@@ -73,7 +75,7 @@ class SupplyPlayer extends Game.Player {
     //TODO initialise with starting hand
     this.hand = [];
     for (let i = LOWEST_STARTING_MONEY; i <= LARGEST_STARTING_MONEY; i++) {
-      this.hand.push(new Card(MONEY,i,i,null));
+      this.hand.push(new Card(MONEY,i,i,i,null));
     }
 
     //this players current deck
@@ -185,16 +187,26 @@ function constructDeck() {
     //2 sets of money cards
     //exclude the starting cards
     if (i > LARGEST_STARTING_MONEY) {
-      deck.push(new Card(MONEY,i,i,null));
-      deck.push(new Card(MONEY,i,i,null));
+      deck.push(new Card(MONEY,i,i,i,null));
+      deck.push(new Card(MONEY,i,i,i,null));
     }
 
     //attack cards
-    deck.push(new Card(ATTACK,i,i,null));
+    deck.push(new Card(ATTACK,i,i,i,null));
 
     //defence cards
-    deck.push(new Card(DEFENCE,i,i,null));
+    deck.push(new Card(DEFENCE,i,i,i,null));
   }
+
+  deck.push(new Card(MONEY,10,15,'Q',queenSpecial));
+  deck.push(new Card(MONEY,10,15,'Q',queenSpecial));
+  deck.push(new Card(ATTACK,10,15,'Q',queenSpecial));
+  deck.push(new Card(DEFENCE,10,15,'Q',queenSpecial));
+
+  deck.push(new Card(MONEY,10,15,'K',kingSpecial));
+  deck.push(new Card(MONEY,10,15,'K',kingSpecial));
+  deck.push(new Card(ATTACK,10,15,'K',kingSpecial));
+  deck.push(new Card(DEFENCE,10,15,'K',kingSpecial));
 
   return deck;
 }
@@ -378,8 +390,31 @@ class Supply extends Game.Game {
         case 'scrap':
           //scrap the supply row
           if (this.currentPlayer == player.username) {
-            //TODO scrap the supply row
+            // scrap the supply row
+            let moneyCards = 0;
+            let specialCards = 0;
+
+            for (let i = 0; i < this.supplyRow.length; i++) {
+              if (this.supplyRow[i].special != null) {
+                specialCards++;
+              }
+              if (this.supplyRow[i].type == MONEY) {
+                moneyCards++;
+              }
+            }
+
+            if (moneyCards >= 3 || specialCards >= 3) {
+              this.scrapped = this.scrapped.concat(this.supplyRow);
+              this.supplyRow = [];
+
+              //draw the supply row
+              for (let i = 0; i < SUPPLY_ROW_SIZE; i++) {
+                this.supplyRow.push(this.deck.pop());
+              }
+              this.sendStatus();
+            }
           }
+          break;
         case 'pass':
           // pass turn to the next player
           if (this.currentPlayer == player.username) {

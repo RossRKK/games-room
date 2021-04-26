@@ -24,7 +24,7 @@ var Supply = (function() {
   function renderDefence(defence, i) {
     var fakeCard = {
       type: 'DEFENCE',
-      value: defence.map(x => x.value).reduce((x,y) => x+y)
+      displayValue: defence.map(x => x.value).reduce((x,y) => x+y)
     };
     var cardDiv = renderCard(fakeCard, i);
     return cardDiv;
@@ -66,7 +66,7 @@ var Supply = (function() {
 
     wrapCol($('<div/>', {
       class: 'card-value',
-      text: card.value
+      text: card.displayValue
     })).appendTo(bodyRow);
 
     return cardDiv;
