@@ -128,6 +128,7 @@ class SupplyPlayer extends Game.Player {
       if (card.special) {
         card.special(game, player, special);
       }
+      this.cardsPlayed++;
       return true;
     } else {
       return false;
@@ -310,6 +311,13 @@ class Supply extends Game.Game {
     }
   }
 
+  rejectAction(player, msg) {
+    player.ws.send(JSON.stringify({
+      type: 'reject',
+      msg: msg
+    }));
+  }
+
   handleMsg(msg, player) {
     //let the super class handle the message first
     if (super.handleMsg(msg, player)) {
@@ -333,9 +341,13 @@ class Supply extends Game.Game {
             let card = player.lookupFromHand(msg.cardIndex);
             if (player.playCard(card, this, msg.special)) {
               player.removeFromHand(msg.cardIndex);
-            }
 
-            this.sendStatus();
+              this.sendStatus();
+            } else {
+              this.rejectAction(player, 'You can only play ' + PLAY_LIMIT + ' cards per turn');
+            }
+          } else {
+            this.rejectAction(player, 'It is not your turn');
           }
           break;
         case 'attack':
@@ -347,6 +359,8 @@ class Supply extends Game.Game {
               if (opponent.defences.length == 0) {
                 opponent.health -= player.attackPool;
                 player.attackPool = 0;
+              } else {
+                this.rejectAction(player, 'You must attack defences first');
               }
             } else {
               let defenceIndex = msg.cardIndex;
@@ -355,17 +369,21 @@ class Supply extends Game.Game {
 
               let defenceTotal = defence.map(x => x.value).reduce((x,y) => x+y);
 
-              if (player.attackPool > defenceTotal) {
+              if (player.attackPool >= defenceTotal) {
                 player.attackPool -= defenceTotal;
 
                 //destroy target defence
                 opponent.defences.splice(defenceIndex, 1);
 
                 opponent.discard = opponent.discard.concat(defence);
+              } else {
+                this.rejectAction(player, 'Insufficent attack points to destroy this defence');
               }
             }
 
             this.sendStatus();
+          } else {
+            this.rejectAction(player, 'It is not your turn');
           }
           break;
         case 'acquire':
@@ -382,9 +400,13 @@ class Supply extends Game.Game {
                 this.scrapped = [];
               }
               this.supplyRow[msg.cardIndex] = this.deck.pop();
+            } else {
+              this.rejectAction(player, 'Insufficent money to acquire this card');
             }
 
             this.sendStatus();
+          } else {
+            this.rejectAction(player, 'It is not your turn');
           }
           break;
         case 'scrap':
@@ -412,7 +434,11 @@ class Supply extends Game.Game {
                 this.supplyRow.push(this.deck.pop());
               }
               this.sendStatus();
+            } else {
+              this.rejectAction(player, 'There must be 3 speical or money cards to scrap the supply row');
             }
+          } else {
+            this.rejectAction(player, 'It is not your turn');
           }
           break;
         case 'pass':
@@ -424,6 +450,8 @@ class Supply extends Game.Game {
             this.currentPlayer = this.playOrder.shift();
 
             this.sendStatus();
+          } else {
+            this.rejectAction(player, 'It is not your turn');
           }
           break;
         case "ping":

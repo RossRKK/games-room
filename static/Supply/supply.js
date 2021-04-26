@@ -221,9 +221,12 @@ var Supply = (function() {
 
   function handleMsg(msg) {
     switch (msg.type) {
-      case "status":
+      case 'status':
         status = msg;
         render();
+        break;
+      case 'reject':
+        alert(msg.msg);
         break;
       default:
         console.log("Unknown message type " + msg.type);
