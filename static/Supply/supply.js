@@ -3,6 +3,8 @@
 var Supply = (function() {
   var status = null;
 
+  var onScrapSelected = null;
+
   function init() {
     $("#game").load(gameType + "/game.html", function () {
       $('#player-name').text(user);
@@ -101,10 +103,32 @@ var Supply = (function() {
 
   function playCard(targetIndex) {
     if (status.currentPlayer == user) {
-      ws.send(JSON.stringify({
-        type: "play",
-        cardIndex: targetIndex
-      }));
+      var targetCard = status.player.hand[targetIndex];
+
+      //ace special case
+      if (targetCard.displayValue == 'A') {
+        var willScrap = confirm('Do you want to activate scapping ability?');
+
+        if (willScrap) {
+          onScrapSelected = function (scrapTarget) {
+            ws.send(JSON.stringify({
+              type: "play",
+              cardIndex: targetIndex,
+              special: scrapTarget
+            }));
+          }
+        } else {
+          ws.send(JSON.stringify({
+            type: "play",
+            cardIndex: targetIndex
+          }));
+        }
+      } else {
+        ws.send(JSON.stringify({
+          type: "play",
+          cardIndex: targetIndex
+        }));
+      }
     } else {
       alert('It is ' + status.currentPlayer + '\'s turn');
     }
@@ -233,7 +257,12 @@ var Supply = (function() {
 
       $('#hand .card').on('click', function (evt) {
         var targetIndex = evt.currentTarget.dataset.index;
-        playCard(targetIndex);
+        if (onScrapSelected != null) {
+          onScrapSelected(targetIndex);
+          onScrapSelected = null;
+        } else {
+          playCard(targetIndex);
+        }
       });
 
       $('#opponent-defences .card').on('click', function (evt) {

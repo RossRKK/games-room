@@ -20,20 +20,36 @@ function shuffle(array) {
   return array;
 }
 
-const aceSpecial = (game, player, special) => {
-  //TODO this will require extra logic
+const aceSpecial = (game, player, special, index) => {
+  //special is set to the index of the card to scrap by the client
+  let targetCard = player.lookupFromHand(special);
+
+  if (targetCard != index) {
+    //if the played card was before the one being scrapped we need to modify indices
+    if (index < targetCard) {
+      targetCard -= 1;
+    }
+
+    //remove the card from hand
+    player.removeFromHand(special);
+
+    //add to scrap pile
+    game.scrapped.push(targetCard);
+  } else {
+    game.rejectAction(player, 'The ace cannot scrap itself');
+  }
 };
 
-const kingSpecial = (game, player, special) => {
+const kingSpecial = (game, player, special, index) => {
   player.health += 5;
 };
 
-const queenSpecial = (game, player, special) => {
+const queenSpecial = (game, player, special, index) => {
   player.draw(1);
   player.cardsPlayed -= 1;
 };
 
-const jackSpecial = (game, player, special) => {
+const jackSpecial = (game, player, special, index) => {
   let opponent = game.allPlayers[game.playOrder[0]];
   opponent.mustDiscard++;
 };
@@ -81,6 +97,7 @@ class SupplyPlayer extends Game.Player {
     for (let i = LOWEST_STARTING_MONEY; i <= LARGEST_STARTING_MONEY; i++) {
       this.hand.push(new Card(MONEY,i,i,i,null));
     }
+    this.hand.push(new Card(MONEY,1,15,'A',aceSpecial));
 
     //this players current deck
     this.deck = [];
@@ -110,7 +127,7 @@ class SupplyPlayer extends Game.Player {
     this.hand.splice(cardIndex, 1);
   }
 
-  playCard(card, game, special) {
+  playCard(card, game, special, index) {
     if (this.cardsPlayed < PLAY_LIMIT) {
       switch (card.type) {
         case MONEY:
@@ -128,9 +145,11 @@ class SupplyPlayer extends Game.Player {
           break;
       }
 
+      this.removeFromHand(index);
+
       //play the cards special
       if (card.special) {
-        card.special(game, this, special);
+        card.special(game, this, special, index);
       }
       this.cardsPlayed++;
       return true;
@@ -202,6 +221,9 @@ function constructDeck() {
     //defence cards
     deck.push(new Card(DEFENCE,i,i,i,null));
   }
+
+  deck.push(new Card(ATTACK,1,15,'A',aceSpecial));
+  deck.push(new Card(DEFENCE,1,15,'A',aceSpecial));
 
   deck.push(new Card(MONEY,10,15,'J',jackSpecial));
   deck.push(new Card(MONEY,10,15,'J',jackSpecial));
@@ -358,8 +380,7 @@ class Supply extends Game.Game {
               player.cardsPlayed++; //this counts as playing a card
 
               this.sendStatus();
-            } else if (player.playCard(card, this, msg.special)) {
-              player.removeFromHand(msg.cardIndex);
+            } else if (player.playCard(card, this, msg.special, msg.cardIndex)) {
 
               this.sendStatus();
             } else {
