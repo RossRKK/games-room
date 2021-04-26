@@ -267,6 +267,8 @@ class Supply extends Game.Game {
     //mechanism for tracking the current player
     this.currentPlayer = null;
     this.playOrder = [];
+
+    this.winner = null;
   }
 
   addPlayer(player) {
@@ -320,6 +322,7 @@ class Supply extends Game.Game {
   status(player, opponent) {
     return {
       type: 'status',
+      winner: this.winner ? this.winner.username : null,
       player: {
         health: player.health,
         hand: player.hand,
@@ -361,6 +364,13 @@ class Supply extends Game.Game {
     }));
   }
 
+  sendWinner() {
+    this.sendMsgToAll({
+      type: 'winner',
+      winner: this.winner.username
+    });
+  }
+
   handleMsg(msg, player) {
     //let the super class handle the message first
     if (super.handleMsg(msg, player)) {
@@ -368,16 +378,14 @@ class Supply extends Game.Game {
     }
 
     this.log(msg.type);
+
+    if (msg.type != 'ping' && this.winner) {
+      this.rejectAction(player, 'Cannot take action. ' + this.winner.username + ' has won.');
+      return true;
+    }
+
     //handle incoming messages from clients
     switch (msg.type) {
-        case 'ready':
-          //indicate that the player is ready
-          player.ready = true;
-          //start if all players are ready
-          if (this.allReady()) {
-            this.start();
-          }
-          break;
         case 'play':
           if (this.currentPlayer == player.username) {
             //a card was played
@@ -428,6 +436,11 @@ class Supply extends Game.Game {
               } else {
                 this.rejectAction(player, 'Insufficent attack points to destroy this defence');
               }
+            }
+
+            if (opponent.health <= 0) {
+              this.winner = player;
+              this.sendWinner();
             }
 
             this.sendStatus();

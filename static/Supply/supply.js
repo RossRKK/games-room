@@ -303,6 +303,9 @@ var Supply = (function() {
       case 'reject':
         alert(msg.msg);
         break;
+      case 'winner':
+        alert(msg.winner + ' wins');
+        break;
       default:
         console.log("Unknown message type " + msg.type);
     }
