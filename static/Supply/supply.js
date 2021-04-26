@@ -111,6 +111,24 @@ var Supply = (function() {
   }
 
   function pass() {
+    var minAttack = status.opponent.defences.map(x => x.map(y=>y.value).reduce((a,b)=>a+b)).reduce((x,y) => x < y ? x : y,0);
+    var unspentAttack = status.player.attackPool > minAttack;
+    var minCost = status.supplyRow.map(x => x.cost).reduce((x,y) => x < y ? x : y);
+    var unspentMoney = status.player.moneyPool >= minCost;
+
+    if (unspentMoney || unspentAttack) {
+      var msg = unspentMoney && unspentAttack
+        ? 'You have unspent money and attack points. Continue?'
+        : unspentMoney ? 'You have unspent money points. Continue?'
+        : 'You have unspent attack points. Continue?'
+
+      var pass = confirm(msg);
+
+      if (!pass) {
+        return;
+      }
+    }
+
     if (status.currentPlayer == user) {
       ws.send(JSON.stringify({
         type: "pass"
