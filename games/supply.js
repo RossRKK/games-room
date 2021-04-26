@@ -159,6 +159,11 @@ class SupplyPlayer extends Game.Player {
   }
 
   endTurn() {
+    //create the new defence permeneantly
+    if (this.newDefence.length > 0) {
+      this.defences.push(this.newDefence);
+    }
+
     //reset pools for next turn
     this.resetForNextTurn();
 
@@ -273,7 +278,8 @@ class Supply extends Game.Game {
         discard: player.discard,
         playArea: player.playArea,
         attackPool: player.attackPool,
-        moneyPool: player.moneyPool
+        moneyPool: player.moneyPool,
+        newDefence: player.newDefence
       },
       opponent: {
         name: opponent.username,
@@ -283,7 +289,8 @@ class Supply extends Game.Game {
         playArea: opponent.playArea,
         handCount: opponent.hand.length,
         attackPool: opponent.attackPool,
-        moneyPool: opponent.moneyPool
+        moneyPool: opponent.moneyPool,
+        newDefence: opponent.newDefence
       },
       currentPlayer: this.currentPlayer,
       supplyRow: this.supplyRow,
@@ -322,11 +329,29 @@ class Supply extends Game.Game {
         case 'attack':
           //attack opponent
           if (this.currentPlayer == player.username) {
-            //TODO allow the player to specify a target
             let opponent = this.allPlayers[this.playOrder[0]];
 
-            opponent.health -= player.attackPool;
-            player.attackPool = 0;
+            if (msg.cardIndex == null) {
+              if (opponent.defences.length == 0) {
+                opponent.health -= player.attackPool;
+                player.attackPool = 0;
+              }
+            } else {
+              let defenceIndex = msg.cardIndex;
+
+              let defence = opponent.defences[defenceIndex];
+
+              let defenceTotal = defence.map(x => x.value).reduce((x,y) => x+y);
+
+              if (player.attackPool > defenceTotal) {
+                player.attackPool -= defenceTotal;
+
+                //destroy target defence
+                opponent.defences.splice(defenceIndex, 1);
+
+                opponent.discard = opponent.discard.concat(defence);
+              }
+            }
 
             this.sendStatus();
           }

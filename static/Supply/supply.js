@@ -21,6 +21,15 @@ var Supply = (function() {
     });
   }
 
+  function renderDefence(defence, i) {
+    var fakeCard = {
+      type: 'DEFENCE',
+      value: defence.map(x => x.value).reduce((x,y) => x+y)
+    };
+    var cardDiv = renderCard(fakeCard, i);
+    return cardDiv;
+  }
+
   function renderCard(card, i) {
     var cardDiv = renderEmptyCard();
     cardDiv.attr('data-index', i);
@@ -121,6 +130,17 @@ var Supply = (function() {
     }
   }
 
+  function attackDefence(targetIndex) {
+    if (status.currentPlayer == user) {
+      ws.send(JSON.stringify({
+        type: "attack",
+        cardIndex: targetIndex
+      }));
+    } else {
+      alert('It is ' + status.currentPlayer + '\'s turn');
+    }
+  }
+
   function scrap() {
     if (status.currentPlayer == user) {
       ws.send(JSON.stringify({
@@ -134,6 +154,11 @@ var Supply = (function() {
   function render() {
     if (status) {
       $('#opponent-name').text(status.opponent.name);
+      if (status.currentPlayer != user) {
+        $('#opponent-name').addClass('current-player');
+      } else {
+        $('#opponent-name').removeClass('current-player');
+      }
       $('#opponent-health').text(status.opponent.health);
 
       $('#deck').empty();
@@ -148,13 +173,26 @@ var Supply = (function() {
       $('#hand').empty();
       $('#hand').append(status.player.hand.map(renderCard).map(wrapCol));
 
+      $('#defences').empty();
+      $('#defences').append(status.player.defences.map(renderDefence).map(wrapCol));
+
+      $('#opponent-defences').empty();
+      $('#opponent-defences').append(status.opponent.defences.map(renderDefence).map(wrapCol));
+
       $('#play-area').empty();
       $('#play-area').append(status.player.playArea.map(renderCard).map(wrapCol));
+      $('#play-area').append(status.player.newDefence.map(renderCard).map(wrapCol));
 
       $('#opponent-play-area').empty();
       $('#opponent-play-area').append(status.opponent.playArea.map(renderCard).map(wrapCol));
+      $('#opponent-play-area').append(status.opponent.newDefence.map(renderCard).map(wrapCol));
 
       $('#player-name').text(user);
+      if (status.currentPlayer == user) {
+        $('#player-name').addClass('current-player');
+      } else {
+        $('#player-name').removeClass('current-player');
+      }
       $('#player-health').text(status.player.health);
 
       $('#opponent-attack-pool').text(status.opponent.attackPool);
@@ -171,6 +209,12 @@ var Supply = (function() {
       $('#hand .card').on('click', function (evt) {
         var targetIndex = evt.currentTarget.dataset.index;
         playCard(targetIndex);
+      });
+
+      $('#opponent-defences .card').on('click', function (evt) {
+        console.log(evt);
+        var targetIndex = evt.currentTarget.dataset.index;
+        attackDefence(targetIndex);
       });
     }
   }
