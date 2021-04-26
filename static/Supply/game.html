@@ -7,6 +7,9 @@
     height: 8rem;
     width: 6rem;
     text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .card-area {
@@ -14,7 +17,7 @@
     padding: 0.2rem;
     border-radius: 0.5em;
     background-color: #f0f0f0;
-    min-height: 8.2rem;
+    min-height: 8.5rem;
     min-width: 6rem;
   }
 
@@ -53,23 +56,43 @@
 
 </style>
 
-<span id='opponent-name'></span>
-<span id='opponent-health'></span>
 <div class='row'>
-  <div class='col-6'>Opponent Defences</div>
-  <div class='col-2'>Opponent Play Area</div>
-  <div class='col-2'>
-    <span>⚔</span>
-    <span id='opponent-attack-pool'>0</span>
+  <div class='col-4'>
+    <span id='opponent-name'></span>
+    <span id='opponent-health'></span>
   </div>
-  <div class='col-2'>
-    <span>£</span>
-    <span id='opponent-money-pool'>0</span>
+  <div class='col'>
+    <span>Hand</span>
+    <span id='opponent-hand-size'>0</span>
   </div>
 </div>
 <div class='row'>
-  <div class='col-6'><div class='row' id='opponent-defences'></div></div>
-  <div class='col-6'><div class='row card-area' id='opponent-play-area'></div></div>
+  <div class='col-3'>Opponent Defences</div>
+  <div class='col-3'>Opponent Play Area</div>
+  <div class='col-1'>
+    <span>⚔</span>
+    <span id='opponent-attack-pool'>0</span>
+  </div>
+  <div class='col-1'>
+    <span>£</span>
+    <span id='opponent-money-pool'>0</span>
+  </div>
+  <div class='col-2'>Discard Pile</div>
+  <div class='col-1'>Deck</div>
+</div>
+<div class='row'>
+  <div class='col-3'><div class='row' id='opponent-defences'></div></div>
+  <div class='col-5'><div class='row card-area' id='opponent-play-area'></div></div>
+  <div class='col-2'>
+    <div class='row'>
+      <div class='card' id='opponent-discard'>0</div>
+    </div>
+  </div>
+  <div class='col-2'>
+    <div class='row'>
+        <div class='card' id='opponent-deck'>0</div>
+    </div>
+  </div>
 </div>
 
 <hr/>
@@ -132,6 +155,8 @@
 </div>
 
 <div class='row'>
+  <div class='col-2'>Discard Pile</div>
+  <div class='col-2'>Deck</div>
   <div class='col'>Hand</div>
   <div class='col'>
     <div id='to-play-msg'>
@@ -148,9 +173,19 @@
     </div>
   </div>
 </div>
-<div class='row card-area' id='hand'>
-</div>
-
-<div class='row' id='controls'>
-
+<div class='row'>
+  <div class='col-2'>
+    <div class='row'>
+      <div class='card' id='discard'>0</div>
+    </div>
+  </div>
+  <div class='col-2'>
+    <div class='row'>
+        <div class='card' id='deck'>0</div>
+    </div>
+  </div>
+  <div class='col-8'>
+    <div class='row card-area' id='hand'>
+    </div>
+  </div>
 </div>

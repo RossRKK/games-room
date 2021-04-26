@@ -251,6 +251,16 @@ var Supply = (function() {
       //hide warning when non-zero
       $('#dicard-warning').toggle(status.player.mustDiscard > 0);
 
+      $('#deck').text(status.player.deckCount);
+      //TODO allow the player to look through their discard pile
+      $('#discard').text(status.player.discard.length);
+
+      $('#opponent-deck').text(status.opponent.deckCount);
+      //TODO allow the player to look through their discard pile
+      $('#opponent-discard').text(status.opponent.discard.length);
+
+      $('#opponent-hand-size').text(status.opponent.handCount);
+
       $('#supply-row .card').on('click', function (evt) {
         var targetIndex = evt.currentTarget.dataset.index;
         acquireCard(targetIndex, false);
