@@ -206,12 +206,15 @@ var Supply = (function() {
       $('#opponent-play-area').append(status.opponent.newDefence.map(renderCard).map(wrapCol));
 
       $('#player-name').text(user);
-      if (status.currentPlayer == user) {
+      var ourTurn = status.currentPlayer == user;
+      if (ourTurn) {
         $('#player-name').addClass('current-player');
       } else {
         $('#player-name').removeClass('current-player');
       }
       $('#player-health').text(status.player.health);
+      $('#to-play-count').text(status.player.toPlay);
+      $('#to-play-msg').toggle(ourTurn);
 
       $('#opponent-attack-pool').text(status.opponent.attackPool);
       $('#opponent-money-pool').text(status.opponent.moneyPool);

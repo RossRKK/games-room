@@ -302,7 +302,8 @@ class Supply extends Game.Game {
         attackPool: player.attackPool,
         moneyPool: player.moneyPool,
         newDefence: player.newDefence,
-        mustDiscard: player.mustDiscard
+        mustDiscard: player.mustDiscard,
+        toPlay: PLAY_LIMIT - player.cardsPlayed
       },
       opponent: {
         name: opponent.username,
