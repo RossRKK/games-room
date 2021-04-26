@@ -11,10 +11,10 @@
 
   .card-area {
     margin: 0.2em;
-    padding: 0.2em;
+    padding: 0.2rem;
     border-radius: 0.5em;
     background-color: #f0f0f0;
-    min-height: 8rem;
+    min-height: 8.2rem;
     min-width: 6rem;
   }
 
@@ -31,6 +31,10 @@
   }
 
   #supply-row .card {
+    cursor: pointer;
+  }
+
+  #reserve .card {
     cursor: pointer;
   }
 
@@ -71,17 +75,23 @@
 <hr/>
 
 <div class='row'>
-  <div class='col'>Scrapped</div>
   <div class='col-8'>Supply Row</div>
-  <div class='col'>Deck</div>
+  <div class='col'>Reserve</div>
+  <div class='col'>Opponent Reserve</div>
 </div>
 <div class='row'>
-  <div class='col card-area' id='scrapped'></div>
   <div class='col-8 card-area'>
     <div class='row' id='supply-row'>
     </div>
   </div>
-  <div class='col card-area' id='deck'></div>
+  <div class='col'>
+    <div class='row card-area' id='reserve'>
+    </div>
+  </div>
+  <div class='col'>
+    <div class='row card-area' id='opponent-reserve'>
+    </div>
+  </div>
 </div>
 
 

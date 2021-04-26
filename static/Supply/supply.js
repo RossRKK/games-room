@@ -90,11 +90,12 @@ var Supply = (function() {
     return col;
   }
 
-  function acquireCard(targetIndex) {
+  function acquireCard(targetIndex, reserved) {
     if (status.currentPlayer == user) {
       ws.send(JSON.stringify({
         type: "acquire",
-        cardIndex: targetIndex
+        cardIndex: targetIndex,
+        reserved: reserved
       }));
     } else {
       alert('It is ' + status.currentPlayer + '\'s turn');
@@ -203,11 +204,11 @@ var Supply = (function() {
       }
       $('#opponent-health').text(status.opponent.health);
 
-      $('#deck').empty();
-      $('#deck').append(renderEmptyCard());
+      $('#reserve').empty();
+      $('#reserve').append(status.player.reserve.map(renderCard).map(wrapCol));
 
-      $('#scrapped').empty();
-      $('#scrapped').append(renderEmptyCard());
+      $('#opponent-reserve').empty();
+      $('#opponent-reserve').append(status.opponent.reserve.map(renderCard).map(wrapCol));
 
       $('#supply-row').empty();
       $('#supply-row').append(status.supplyRow.map(renderCard).map(wrapCol));
@@ -252,7 +253,12 @@ var Supply = (function() {
 
       $('#supply-row .card').on('click', function (evt) {
         var targetIndex = evt.currentTarget.dataset.index;
-        acquireCard(targetIndex);
+        acquireCard(targetIndex, false);
+      });
+
+      $('#reserve .card').on('click', function (evt) {
+        var targetIndex = evt.currentTarget.dataset.index;
+        acquireCard(targetIndex, true);
       });
 
       $('#hand .card').on('click', function (evt) {

@@ -97,7 +97,6 @@ class SupplyPlayer extends Game.Player {
     for (let i = LOWEST_STARTING_MONEY; i <= LARGEST_STARTING_MONEY; i++) {
       this.hand.push(new Card(MONEY,i,i,i,null));
     }
-    this.hand.push(new Card(MONEY,1,15,'A',aceSpecial));
 
     //this players current deck
     this.deck = [];
@@ -110,6 +109,10 @@ class SupplyPlayer extends Game.Player {
 
     //the players current discard pile
     this.discard = [];
+
+    //cards this player has reserved (i.e. their money ace)
+    this.reserve = [];
+    this.reserve.push(new Card(MONEY,1,15,'A',aceSpecial));
   }
 
   resetForNextTurn() {
@@ -325,7 +328,8 @@ class Supply extends Game.Game {
         moneyPool: player.moneyPool,
         newDefence: player.newDefence,
         mustDiscard: player.mustDiscard,
-        toPlay: PLAY_LIMIT - player.cardsPlayed
+        toPlay: PLAY_LIMIT - player.cardsPlayed,
+        reserve: player.reserve
       },
       opponent: {
         name: opponent.username,
@@ -337,7 +341,8 @@ class Supply extends Game.Game {
         attackPool: opponent.attackPool,
         moneyPool: opponent.moneyPool,
         newDefence: opponent.newDefence,
-        mustDiscard: opponent.mustDiscard
+        mustDiscard: opponent.mustDiscard,
+        reserve: opponent.reserve
       },
       currentPlayer: this.currentPlayer,
       supplyRow: this.supplyRow,
@@ -429,17 +434,24 @@ class Supply extends Game.Game {
         case 'acquire':
           //buy a new card
           if (this.currentPlayer == player.username) {
-            let targetCard = this.supplyRow[msg.cardIndex];
+            let targetCard = msg.reserved
+              ? player.reserve[msg.cardIndex]
+              : this.supplyRow[msg.cardIndex];
 
             if (targetCard.cost <= player.moneyPool) {
               player.acquire(targetCard);
 
-              //draw a new card to replace it
-              if (this.deck.length <= 0) {
-                this.deck = shuffle(this.scrapped);
-                this.scrapped = [];
+              if (msg.reserved) {
+                player.reserve.splice(msg.cardIndex,1);
+              } else {
+                //draw a new card to replace it
+                if (this.deck.length <= 0) {
+                  this.deck = shuffle(this.scrapped);
+                  this.scrapped = [];
+                }
+
+                this.supplyRow[msg.cardIndex] = this.deck.pop();
               }
-              this.supplyRow[msg.cardIndex] = this.deck.pop();
             } else {
               this.rejectAction(player, 'Insufficent money to acquire this card');
             }
