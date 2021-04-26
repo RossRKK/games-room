@@ -21,14 +21,15 @@ function shuffle(array) {
 }
 
 const aceSpecial = (game, player, special, index) => {
-  //special is set to the index of the card to scrap by the client
-  let targetCard = player.lookupFromHand(special);
-
-  if (targetCard != index) {
-    //if the played card was before the one being scrapped we need to modify indices
-    if (index < targetCard) {
-      targetCard -= 1;
+  if (special != index) {
+    //if the ace was in a lower index than the target scrap card
+    //the index of that scrap card is now 1 less
+    //because the ace has been removed by this point
+    if (index < special) {
+      special -= 1;
     }
+    //special is set to the index of the card to scrap by the client
+    let targetCard = player.lookupFromHand(special);
 
     //remove the card from hand
     player.removeFromHand(special);
@@ -112,7 +113,7 @@ class SupplyPlayer extends Game.Player {
 
     //cards this player has reserved (i.e. their money ace)
     this.reserve = [];
-    this.reserve.push(new Card(MONEY,1,15,'A',aceSpecial));
+    this.reserve.push(new Card(MONEY,1,1,'A',aceSpecial));
   }
 
   resetForNextTurn() {
@@ -132,6 +133,9 @@ class SupplyPlayer extends Game.Player {
 
   playCard(card, game, special, index) {
     if (this.cardsPlayed < PLAY_LIMIT) {
+      //remove from hand in order to play
+      this.removeFromHand(index);
+
       switch (card.type) {
         case MONEY:
           this.moneyPool += card.value;
@@ -144,16 +148,14 @@ class SupplyPlayer extends Game.Player {
         case DEFENCE:
           this.newDefence.push(card);
           //do not add to play area
-          //TODO deal with this differently because its a defence card
           break;
       }
-
-      this.removeFromHand(index);
 
       //play the cards special
       if (card.special) {
         card.special(game, this, special, index);
       }
+
       this.cardsPlayed++;
       return true;
     } else {
@@ -485,6 +487,11 @@ class Supply extends Game.Game {
 
               //draw the supply row
               for (let i = 0; i < SUPPLY_ROW_SIZE; i++) {
+                //draw a new card to replace it
+                if (this.deck.length <= 0) {
+                  this.deck = shuffle(this.scrapped);
+                  this.scrapped = [];
+                }
                 this.supplyRow.push(this.deck.pop());
               }
               this.sendStatus();
