@@ -113,7 +113,7 @@ class SupplyPlayer extends Game.Player {
 
     //cards this player has reserved (i.e. their money ace)
     this.reserve = [];
-    this.reserve.push(new Card(MONEY,1,1,'A',aceSpecial));
+    this.reserve.push(new Card(MONEY,1,15,'A',aceSpecial));
   }
 
   resetForNextTurn() {

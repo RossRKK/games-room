@@ -112,11 +112,17 @@ var Supply = (function() {
 
         if (willScrap) {
           onScrapSelected = function (scrapTarget) {
-            ws.send(JSON.stringify({
-              type: "play",
-              cardIndex: targetIndex,
-              special: scrapTarget
-            }));
+            if (scrapTarget == targetIndex) {
+              alert('The ace cannot scrap itself');
+            } else {
+              ws.send(JSON.stringify({
+                type: "play",
+                cardIndex: targetIndex,
+                special: scrapTarget
+              }));
+              //unbind this handler
+              onScrapSelected = null;
+            }
           }
         } else {
           ws.send(JSON.stringify({
@@ -136,8 +142,8 @@ var Supply = (function() {
   }
 
   function pass() {
-    var minAttack = status.opponent.defences.map(x => x.map(y=>y.value).reduce((a,b)=>a+b)).reduce((x,y) => x < y ? x : y,0);
-    var unspentAttack = status.player.attackPool > minAttack;
+    var minAttack = status.opponent.defences.length > 0 ? status.opponent.defences.map(x => x.map(y=>y.value).reduce((a,b)=>a+b)).reduce((x,y) => x < y ? x : y) : -1;
+    var unspentAttack = status.opponent.defences.length > 0 ? status.player.attackPool >= minAttack : status.player.attackPool > 0;
     var minCost = status.supplyRow.map(x => x.cost).reduce((x,y) => x < y ? x : y);
     var unspentMoney = status.player.moneyPool >= minCost;
 
@@ -275,7 +281,6 @@ var Supply = (function() {
         var targetIndex = evt.currentTarget.dataset.index;
         if (onScrapSelected != null) {
           onScrapSelected(targetIndex);
-          onScrapSelected = null;
         } else {
           playCard(targetIndex);
         }
