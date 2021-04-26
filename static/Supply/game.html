@@ -21,6 +21,10 @@
     min-width: 6rem;
   }
 
+  .card-area.active-card-area {
+    background-color: #cccccc;
+  }
+
   .card-type {
     font-size: 2.5em;
   }
@@ -126,13 +130,13 @@
     <span id='player-health'></span>
   </div>
   <div class='col-2'>
-    <button type="button" id='scrap-btn' class='btn btn-primary'>Scrap</button>
+    <button type="button" id='scrap-btn' class='btn btn-primary turn-only'>Scrap</button>
   </div>
   <div class='col-2'>
-    <button type="button" id='attack-btn' class='btn btn-danger'>Attack</button>
+    <button type="button" id='attack-btn' class='btn btn-danger turn-only'>Attack</button>
   </div>
   <div class='col-2'>
-    <button type="button" id='end-turn-btn' class='btn btn-success'>End Turn</button>
+    <button type="button" id='end-turn-btn' class='btn btn-success turn-only'>End Turn</button>
   </div>
 </div>
 

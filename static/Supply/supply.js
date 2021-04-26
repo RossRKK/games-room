@@ -240,9 +240,20 @@ var Supply = (function() {
       var ourTurn = status.currentPlayer == user;
       if (ourTurn) {
         $('#player-name').addClass('current-player');
+
+        $('#hand').addClass('active-card-area');
+        $('#play-area').addClass('active-card-area');
+        $('#opponent-play-area').removeClass('active-card-area');
       } else {
         $('#player-name').removeClass('current-player');
+
+        $('#hand').removeClass('active-card-area');
+        $('#play-area').removeClass('active-card-area');
+        $('#opponent-play-area').addClass('active-card-area');
       }
+
+      $(".turn-only").prop("disabled", !ourTurn);
+
       $('#player-health').text(status.player.health);
       $('#to-play-count').text(status.player.toPlay);
       $('#to-play-msg').toggle(ourTurn);
