@@ -14,6 +14,8 @@ var gameType = "WouldYouRather";
 var ws;
 
 var user;
+var gamesMap = {};
+var gameId;
 
 function joinGame(user, gameId) {
     ws = openWebSocket(null, user, gameId);
@@ -34,8 +36,8 @@ $(document).ready(function () {
     }
 
     $("#join-btn").on("click", function (e) {
-        var user = $("#name").val();
-        var gameId = $("#game-id").val();
+        user = $("#name").val();
+        gameId = $("#game-id").val();
 
         joinGame(user, gameId);
     });
@@ -49,6 +51,7 @@ $(document).ready(function () {
 
 function addGameButtons(games) {
     games.forEach(function (game) {
+        gamesMap[game.id] = game;
         var btn = document.createElement("button");
         btn["data-game"] = game;
         btn.innerText = game.title;
@@ -109,9 +112,12 @@ function handleWebSocket(ws) {
         switch (msg.type) {
             case "ID":
                 gameType = msg.gameType;
+                id = msg.id;
+
                 //initialise the game
                 gameTypes[gameType].init();
                 $("#id").text(msg.id);
+                $("#header").text(gamesMap[msg.gameType].title);
                 break;
             default:
                 gameTypes[gameType].handleMsg(msg);

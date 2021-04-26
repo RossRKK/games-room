@@ -25,13 +25,35 @@
   .card-value {
     font-size: 2em;
   }
+
+  #hand .card {
+    cursor: pointer;
+  }
+
+  #supply-row .card {
+    cursor: pointer;
+  }
+
+  #scrap-btn, #attack-btn, #end-turn-btn {
+    cursor: hover;
+    margin: 0 auto;
+  }
+
 </style>
 
 <span id='opponent-name'></span>
 <span id='opponent-health'></span>
 <div class='row'>
   <div class='col-6'>Opponent Defences</div>
-  <div class='col-6'>Opponent Play Area</div>
+  <div class='col-2'>Opponent Play Area</div>
+  <div class='col-2'>
+    <span>⚔</span>
+    <span id='opponent-attack-pool'>0</span>
+  </div>
+  <div class='col-2'>
+    <span>£</span>
+    <span id='opponent-money-pool'>0</span>
+  </div>
 </div>
 <div class='row'>
   <div class='col-6'><div class='row' id='opponent-defences'></div></div>
@@ -57,12 +79,34 @@
 
 <hr/>
 
-<span id='player-name'></span>
-<span id='player-health'></span>
+<div class='row'>
+  <div class='col-6'>
+    <span id='player-name'></span>
+    <span id='player-health'></span>
+  </div>
+  <div class='col-2'>
+    <button type="button" id='scrap-btn' class='btn btn-primary'>Scrap</button>
+  </div>
+  <div class='col-2'>
+    <button type="button" id='attack-btn' class='btn btn-danger'>Attack</button>
+  </div>
+  <div class='col-2'>
+    <button type="button" id='end-turn-btn' class='btn btn-success'>End Turn</button>
+  </div>
+</div>
+
 
 <div class='row'>
   <div class='col-6'>Defences</div>
-  <div class='col-6'>Play Area</div>
+  <div class='col-2'>Play Area</div>
+  <div class='col-2'>
+    <span>⚔</span>
+    <span id='player-attack-pool'>0</span>
+  </div>
+  <div class='col-2'>
+    <span>£</span>
+    <span id='player-money-pool'>0</span>
+  </div>
 </div>
 <div class='row'>
   <div class='col-6'><div class='row' id='defences'></div></div>

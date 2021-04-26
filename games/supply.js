@@ -45,6 +45,7 @@ class Card {
   constructor(type, value, cost, special) {
     this.type = type;
     this.value = value;
+    this.cost = cost;
     this.special = special;
   }
 }
@@ -83,6 +84,9 @@ class SupplyPlayer extends Game.Player {
 
     //this players current defences
     this.defences = [];
+
+    //the players current discard pile
+    this.discard = [];
   }
 
   resetForNextTurn() {
@@ -105,12 +109,16 @@ class SupplyPlayer extends Game.Player {
       switch (card.type) {
         case MONEY:
           this.moneyPool += card.value;
+          this.playArea.push(card);
           break;
         case ATTACK:
           this.attackPool += card.value;
+          this.playArea.push(card);
           break;
         case DEFENCE:
           this.newDefence.push(card);
+          //do not add to play area
+          //TODO deal with this differently because its a defence card
           break;
       }
 
@@ -125,29 +133,37 @@ class SupplyPlayer extends Game.Player {
   }
 
   draw(count) {
-    let drawn = [];
     //draw new cards
     for (let i = 0; i < count; i++) {
-      if (deck.length > 0) {
-        drawn.push(deck.pop());
+
+      if (this.deck.length > 0) {
+        this.hand.push(this.deck.pop());
       } else {
         //re-suffle discard to form new deck
         this.deck = shuffle(this.discard);
         this.discard = [];
+        if (this.deck.length > 0) {
+          this.hand.push(this.deck.pop());
+        } else {
+          //we cannot draw more cards
+          break;
+        }
       }
     }
-
-    return drawn;
   }
 
   acquire(card) {
     //add acquired card to discard pile
     this.discard.push(card);
+    this.moneyPool -= card.cost;
   }
 
   endTurn() {
     //reset pools for next turn
-    resetForNextTurn();
+    this.resetForNextTurn();
+
+    this.discard = this.discard.concat(this.playArea);
+    this.playArea = [];
 
     //draw up to correct number of cards
     let missing = HAND_SIZE - this.hand.length;
@@ -233,7 +249,7 @@ class Supply extends Game.Game {
     }
 
     //pop the current player
-    this.currentPlayer = this.playOrder.pop();
+    this.currentPlayer = this.playOrder.shift();
 
     this.sendStatus();
   }
@@ -255,7 +271,9 @@ class Supply extends Game.Game {
         hand: player.hand,
         defences: player.defences,
         discard: player.discard,
-        playArea: player.playArea
+        playArea: player.playArea,
+        attackPool: player.attackPool,
+        moneyPool: player.moneyPool
       },
       opponent: {
         name: opponent.username,
@@ -263,7 +281,9 @@ class Supply extends Game.Game {
         defences: opponent.defences,
         discard: opponent.discard,
         playArea: opponent.playArea,
-        handCount: opponent.hand.length
+        handCount: opponent.hand.length,
+        attackPool: opponent.attackPool,
+        moneyPool: opponent.moneyPool
       },
       currentPlayer: this.currentPlayer,
       supplyRow: this.supplyRow,
@@ -292,7 +312,9 @@ class Supply extends Game.Game {
           if (this.currentPlayer == player.username) {
             //a card was played
             let card = player.lookupFromHand(msg.cardIndex);
-            player.playCard(card, this, msg.special); //TODO handle failure
+            if (player.playCard(card, this, msg.special)) {
+              player.removeFromHand(msg.cardIndex);
+            }
 
             this.sendStatus();
           }
@@ -305,24 +327,27 @@ class Supply extends Game.Game {
 
             opponent.health -= player.attackPool;
             player.attackPool = 0;
+
             this.sendStatus();
           }
           break;
         case 'acquire':
           //buy a new card
           if (this.currentPlayer == player.username) {
-            let targetCard = this.supplyRow[targetCardIndex];
+            let targetCard = this.supplyRow[msg.cardIndex];
 
-            if (targetCard.cost < player.moneyPool) {
+            if (targetCard.cost <= player.moneyPool) {
               player.acquire(targetCard);
 
               //draw a new card to replace it
-              if (deck.length <= 0) {
-                this.deck = suffle(this.scrapped);
+              if (this.deck.length <= 0) {
+                this.deck = shuffle(this.scrapped);
                 this.scrapped = [];
               }
-              this.supplyRow[targetCardIndex] = this.deck.pop();
+              this.supplyRow[msg.cardIndex] = this.deck.pop();
             }
+
+            this.sendStatus();
           }
           break;
         case 'scrap':
@@ -336,7 +361,9 @@ class Supply extends Game.Game {
             //pass the turn to the next player
             player.endTurn();
             this.playOrder.push(this.currentPlayer);
-            this.currentPlayer = this.playOrder.pop();
+            this.currentPlayer = this.playOrder.shift();
+
+            this.sendStatus();
           }
           break;
         case "ping":
