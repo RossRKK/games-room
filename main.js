@@ -14,7 +14,7 @@ app.use(express.static("static"));
 
 app.get("/games", (req, res) => {
     res.send(Object.values(model.getGameTypes()).map(g => {
-        console.log(g)
+        // console.log(g)
         return {
             id: g.id,
             title: g.title,
@@ -23,47 +23,35 @@ app.get("/games", (req, res) => {
     }));
 });
 
+app.post('/api/:gameType', (req, res) => {
+  let game = model.startGame(req.params.gameType);
+  res.send(game.id);
+});
+
 function handleWebSocket(ws, req) {
     try {
-        console.log("Got connection \"" + req.params.gameType + "\" \"" + req.params.gameId + "\" \"" + req.params.username + "\"");
+        console.log("Got connection \"" + req.params.gameId + "\" \"" + req.params.username + "\"");
 
-        // let player = new Game.Player(req.params.username, ws);
-        let player;
+        let game = model.getGame(req.params.gameId);
 
-        let game;
+        //whether the requesting player is created the game
+        let isCreator = Object.keys(game.allPlayers).length == 0;
 
-        if (req.params.gameId) {
-            game = model.getGame(req.params.gameId);
-        }
+        //create a player of type matching the game
+        let player = new game.Player(req.params.username, ws);
 
-        //whether the requesting player is creating the game
-        let isCreator = false;
+        ws.send(JSON.stringify({
+            type: "ID",
+            id: game.id,
+            gameType: game.type
 
-        if (!game) {
-            game = model.startGame(req.params.gameType);
-            isCreator = true;
-        }
+        }));
 
-        if (game) {
-            //create a player of type matching the game
-            player = new game.Player(req.params.username, ws);
+        game.addPlayer(player);
 
-            ws.send(JSON.stringify({
-                type: "ID",
-                id: game.id,
-                gameType: game.type
-
-            }));
-
-            game.addPlayer(player);
-
-            //make the player an admin
-            if (isCreator && game.addAdmin) {
-                game.addAdmin(player.username);
-            }
-        } else {
-            ws.send("Error starting game");
-            ws.close();
+        //make the player an admin
+        if (isCreator && game.addAdmin) {
+            game.addAdmin(player.username);
         }
 
         ws.on('message', function (msg) {
@@ -102,8 +90,7 @@ function handleWebSocket(ws, req) {
     }
 }
 
-app.ws("/:gameType/:username/:gameId", handleWebSocket);
-app.ws("/:gameType/:username", handleWebSocket);
+app.ws("/api/:gameId/:username", handleWebSocket);
 
 const port = process.env.PORT ? process.env.PORT : 8080;
 

@@ -18,7 +18,7 @@ var gamesMap = {};
 var gameId;
 
 function joinGame(user, gameId) {
-    ws = openWebSocket(null, user, gameId);
+    ws = openWebSocket(user, gameId);
 
     handleWebSocket(ws);
 
@@ -28,12 +28,12 @@ function joinGame(user, gameId) {
 }
 
 $(document).ready(function () {
-    if (window.location.pathname) {
-        var parts = window.location.pathname.split('/');
-        joinGame(parts[0], parts[1]);
-    } else {
-        $("#game").hide();
-    }
+    // if (window.location.pathname) {
+    //     var parts = window.location.pathname.split('/');
+    //     joinGame(parts[0], parts[1]);
+    // } else {
+    //     $("#game").hide();
+    // }
 
     $("#join-btn").on("click", function (e) {
         user = $("#name").val();
@@ -52,33 +52,55 @@ $(document).ready(function () {
 function addGameButtons(games) {
     games.forEach(function (game) {
         gamesMap[game.id] = game;
-        var btn = document.createElement("button");
-        btn["data-game"] = game;
-        btn.innerText = game.title;
 
-        btn.className = "btn btn-primary";
+        var gameRow = $('<div/>', {
+          class: 'row'
+        });
 
-        btn.onclick = function (e) {
-            var game = e.target["data-game"];
-            gameType = game.id;
+        $('<div/>', {
+          class: 'col',
+          text: game.title
+        }).appendTo(gameRow);
 
-            $("#header").text(game.title);
-            document.title = game.title;
+        var buttonWrapper = $('<div/>', {
+          class: 'col'
+        });
+        buttonWrapper.appendTo(gameRow);
 
-            user = $("#name").val();
-            ws = openWebSocket(gameType, user);
+        var button = $('<button/>', {
+          class: 'btn btn-primary',
+          text: 'Start'
+        });
+        button.appendTo(buttonWrapper);
 
-            handleWebSocket(ws);
+        button.attr('data-game', game.id);
 
-            $("#join").hide();
-            $("#game").show();
-        }
+        button.on('click', function (e) {
+            var gameType = e.target.dataset.game;
 
-        $("#games").append(btn);
+            $.post('/api/' + encodeURIComponent(gameType)).done(function (id) {
+              console.log(id);
+              alert('Started ' + gamesMap[gameType].title + ' in room ' + id);
+              $("#game-id").val(id);
+            });
+
+            // $("#header").text(game.title);
+            // document.title = game.title;
+            //
+            // user = $("#name").val();
+            // ws = openWebSocket(gameType, user);
+            //
+            // handleWebSocket(ws);
+            //
+            // $("#join").hide();
+            // $("#game").show();
+        });
+
+        $("#games").append(gameRow);
     });
 }
 
-function openWebSocket(gameType, username, gameId) {
+function openWebSocket(username, gameId) {
     var loc = window.location, new_uri;
         if (loc.protocol === "https:") {
             new_uri = "wss:";
@@ -87,9 +109,8 @@ function openWebSocket(gameType, username, gameId) {
         }
     new_uri += "//" + loc.host;
 
-    var url = new_uri + "/"+ encodeURIComponent(gameType) + "/" + encodeURIComponent(username)
-     + (gameId ? ("/" + encodeURIComponent(gameId)) : "");
-     console.log(url)
+    var url = new_uri + "/api/" + encodeURIComponent(gameId) + "/" + encodeURIComponent(username);
+    console.log(url)
     var ws =  new WebSocket(url);
 
     //setup auto-ping
@@ -125,12 +146,13 @@ function handleWebSocket(ws) {
     }
 
     ws.onclose = function () {
-        clearInterval(ws.pingInterval);
-        $("#join").show();
-        $("#game").hide();
-        $("#game").empty();
-
-        $("#header").text("Games Room");
-        $("#id").text("");
+      alert('Connection to server failed');
+        // clearInterval(ws.pingInterval);
+        // $("#join").show();
+        // $("#game").hide();
+        // $("#game").empty();
+        //
+        // $("#header").text("Games Room");
+        // $("#id").text("");
     }
 }

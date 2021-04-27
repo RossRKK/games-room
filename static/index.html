@@ -30,26 +30,30 @@
               <div class='col'><span><h2 id="id"></h2></span></div>
             </div>
 
-            <div id="join">
-
-                <div>
-                    <span>Username:</span>
-                    <span><input id="name" type="text"></input></span>
+            <div id="join" class='row'>
+                <div class='col-6'>
+                  <form class="form-inline">
+                    <span for='name'>Username</span>
+                    <span><input id="name" type="text" class='form-control'></input></span>
+                  </form>
+                </div>
+                <div class='col-6'>
+                  <form class="form-inline">
+                    <span>Join Game</span>
+                    <span><input id="game-id" type="text" class='form-control' placeholder="Game ID"></input></span>
+                    <span><button id="join-btn" type='button' class="btn btn-primary">Join</button></span>
+                  </form>
                 </div>
 
-                <hr>
+                <div class='col-12'>
+                  <div class='row'>
+                    <div class='col'><h3>Start New Game</h3></div>
+                  </div>
+                  <div class='row'>
+                    <div class='col' id="games">
+                    </div>
+                  </div>
 
-                <div>
-                    <span>Start New Game:</span>
-                    <span id="games"></span>
-                </div>
-
-                <hr>
-
-                <div>
-                    <span>Join Game:</span>
-                    <span><input id="game-id" type="text"></input></span>
-                    <span><button id="join-btn" class="btn btn-primary">Join</button></span>
                 </div>
             </div>
 
