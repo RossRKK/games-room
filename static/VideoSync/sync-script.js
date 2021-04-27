@@ -2,8 +2,8 @@
   "use strict";
   var gameType = "VideoSync";
 
-  var host = "wss://games-room.herokuapp.com";
-  // var host = "ws://localhost:8080";
+  // var host = "wss://games-room.herokuapp.com";
+  var host = "ws://localhost:8080";
 
 
   function iframeRef(frameRef) {
@@ -74,8 +74,7 @@
 
   function start(username, gameId) {
 
-    var url = host + "/api/" + encodeURIComponent(gameType) + "/" + encodeURIComponent(username)
-     + (gameId ? ("/" + encodeURIComponent(gameId)) : "");
+    var url = host + "/api/" + encodeURIComponent(gameId) + "/" + encodeURIComponent(username);
      console.log(url)
     var ws =  new WebSocket(url);
 
@@ -86,6 +85,13 @@
               type: "ping"
           }));
       }, 30000);
+
+      var failFunc = function () {
+        alert('Video Sync connection failed');
+      }
+
+      ws.onclose = failFunc;
+      ws.onerror = failFunc;
 
       ws.onmessage = function (rawMsg) {
         let msg = JSON.parse(rawMsg.data);
