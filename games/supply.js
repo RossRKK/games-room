@@ -393,6 +393,7 @@ class Supply extends Game.Game {
             if (player.mustDiscard > 0) {
               //discard without action
               player.removeFromHand(msg.cardIndex);
+              player.discard.push(card);
               player.mustDiscard--;
               player.cardsPlayed++; //this counts as playing a card
 
