@@ -2,8 +2,8 @@
   "use strict";
   var gameType = "VideoSync";
 
-  // var host = "wss://games-room.herokuapp.com";
-  var host = "ws://localhost:8080";
+  var host = "wss://games-room.herokuapp.com";
+  // var host = "ws://localhost:8080";
 
 
   function iframeRef(frameRef) {
