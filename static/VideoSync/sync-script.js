@@ -74,7 +74,7 @@
 
   function start(username, gameId) {
 
-    var url = host + "/"+ encodeURIComponent(gameType) + "/" + encodeURIComponent(username)
+    var url = host + "/api/" + encodeURIComponent(gameType) + "/" + encodeURIComponent(username)
      + (gameId ? ("/" + encodeURIComponent(gameId)) : "");
      console.log(url)
     var ws =  new WebSocket(url);
