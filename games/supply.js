@@ -273,9 +273,19 @@ class Supply extends Game.Game {
 
   addPlayer(player) {
     if (Object.keys(this.allPlayers).length >= 2) {
-      throw "Only 2 players can play";
+      //the player can rejoin if they're not new
+      if (!this.allPlayers[player.username]) {
+        throw "Only 2 players can play";
+      }
+    }
+    // super.addPlayer(player)
+    // re-instate the players connection
+    if (this.allPlayers[player.username]) {
+        // throw "Tried to add existing player";
+        // preserve player state by inly copying the connection
+        this.allPlayers[player.username].ws = player.ws;
     } else {
-      super.addPlayer(player);
+        this.allPlayers[player.username] = player;
     }
 
     if (!this.started) {
@@ -286,6 +296,14 @@ class Supply extends Game.Game {
       //send status to the new player who has rejoined
       this.sendStatus();
     }
+  }
+
+  removePlayer(player) {
+      //close the web socket
+      player.ws.close();
+      // do not remove the player, we need to preserve their state
+      // incase they rejoin
+      // delete this.allPlayers[player.username];
   }
 
   allReady() {
