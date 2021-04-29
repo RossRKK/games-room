@@ -79,8 +79,8 @@ class SupplyPlayer extends Game.Player {
   constructor (username, ws) {
     super(username, ws);
 
-    //whether the player is ready to start
-    this.ready = false;
+    //whether the game has started
+    this.hasStarted = false;
 
     this.health = STARTING_HEALTH;
 
@@ -278,8 +278,13 @@ class Supply extends Game.Game {
       super.addPlayer(player);
     }
 
-    if (Object.keys(this.allPlayers).length == 2) {
-      this.start();
+    if (!this.started) {
+      if (Object.keys(this.allPlayers).length == 2) {
+        this.start();
+      }
+    } else {
+      //send status to the new player who has rejoined
+      this.sendStatus();
     }
   }
 
@@ -289,6 +294,7 @@ class Supply extends Game.Game {
 
   start() {
     this.log('Starting');
+    this.started = true;
     //randomise player order
     this.playOrder = shuffle(Object.keys(this.allPlayers));
 
