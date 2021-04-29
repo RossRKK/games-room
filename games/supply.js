@@ -21,7 +21,7 @@ function shuffle(array) {
 }
 
 const aceSpecial = (game, player, special, index) => {
-  if (special != index) {
+  if (special && special != index) {
     //if the ace was in a lower index than the target scrap card
     //the index of that scrap card is now 1 less
     //because the ace has been removed by this point
@@ -396,6 +396,9 @@ class Supply extends Game.Game {
   }
 
   handleMsg(msg, player) {
+    //because a player might be re-instantiated this is needed
+    //ths makes sure that the player instance we use is the original
+    player = this.allPlayers[player.username]
     //let the super class handle the message first
     if (super.handleMsg(msg, player)) {
       return true;
