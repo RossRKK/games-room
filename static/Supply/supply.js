@@ -5,6 +5,8 @@ var Supply = (function() {
 
   var onScrapSelected = null;
 
+  var botHost = 'https://supply-bot.herokuapp.com/api/summon/';
+
   function init() {
     $("#game").load(gameType + "/game.html", function () {
       $('#player-name').text(user);
@@ -13,8 +15,14 @@ var Supply = (function() {
       $('#attack-btn').on('click', attack);
       $('#end-turn-btn').on('click', pass);
 
+      $('#summon-btn').on('click', summon);
+
       render();
     });
+  }
+
+  function summon() {
+    $.post(botHost + gameId)
   }
 
   function renderEmptyCard() {
@@ -202,6 +210,9 @@ var Supply = (function() {
 
   function render() {
     if (status) {
+      //hide the summon button as soon as the game starts
+      $('#summon-btn').hide();
+
       $('#opponent-name').text(status.opponent.name);
       if (status.currentPlayer != user) {
         $('#opponent-name').addClass('current-player');
